@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>お絵かきCR レギュレーションチェッカー</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic UI', sans-serif;
+    background: #f0f2f5;
+    min-height: 100vh;
+    padding: 24px;
+    color: #1a1a2e;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  .header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 6px;
+  }
+
+  .header p {
+    font-size: 13px;
+    color: #6b7280;
+  }
+
+  .logo-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 14px;
+  }
+
+  .media-select {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+
+  .media-btn {
+    padding: 8px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    background: white;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .media-btn:hover {
+    border-color: #667eea;
+    color: #667eea;
+  }
+
+  .media-btn.active {
+    border-color: #667eea;
+    background: #667eea;
+    color: white;
+  }
+
+  .media-hint {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 8px;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 180px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 14px;
+    font-family: inherit;
+    line-height: 1.7;
+    resize: vertical;
+    transition: border-color 0.15s;
+    outline: none;
+    color: #1a1a2e;
+  }
+
+  textarea:focus {
+    border-color: #667eea;
+  }
+
+  textarea::placeholder {
+    color: #c4c9d4;
+  }
+
+  .check-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    margin-top: 14px;
+    letter-spacing: 0.3px;
+  }
+
+  .check-btn:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+  }
+
+  .check-btn:active {
+    transform: translateY(0);
+  }
+
+  .result-card {
+    display: none;
+  }
+
+  .verdict {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+
+  .verdict.pass {
+    background: #f0fdf4;
+    border: 2px solid #86efac;
+  }
+
+  .verdict.fail {
+    background: #fff7ed;
+    border: 2px solid #fdba74;
+  }
+
+  .verdict-icon {
+    font-size: 32px;
+    line-height: 1;
+  }
+
+  .verdict-text h2 {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .verdict.pass .verdict-text h2 { color: #15803d; }
+  .verdict.fail .verdict-text h2 { color: #c2410c; }
+
+  .verdict-text p {
+    font-size: 13px;
+    margin-top: 3px;
+  }
+
+  .verdict.pass .verdict-text p { color: #16a34a; }
+  .verdict.fail .verdict-text p { color: #ea580c; }
+
+  .violations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .violation-item {
+    border: 1px solid #fde68a;
+    border-left: 4px solid #f59e0b;
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: #fffbeb;
+  }
+
+  .violation-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .violation-num {
+    background: #f59e0b;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 6px;
+  }
+
+  .violation-rule {
+    font-size: 12px;
+    font-weight: 600;
+    color: #92400e;
+  }
+
+  .violation-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .violation-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .violation-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+    min-width: 60px;
+    padding-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .violation-content {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .bad-text {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 13px;
+  }
+
+  .good-text {
+    background: #dcfce7;
+    color: #16a34a;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 13px;
+  }
+
+  .section-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .corrected-text {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: #1a1a2e;
+    position: relative;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .copy-btn:hover { opacity: 0.85; }
+
+  .note-box {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #1d4ed8;
+    line-height: 1.7;
+  }
+
+  .note-box strong {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: #1e40af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid #f3f4f6;
+    margin: 20px 0;
+  }
+
+  .highlight-ng {
+    background: #fee2e2;
+    border-radius: 3px;
+  }
+
+  .counter-badge {
+    background: #ef4444;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 10px;
+    margin-left: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="logo-badge">お絵かきクリエイターズ</div>
+    <h1>レギュレーションチェッカー</h1>
+    <p>台本・コピー・バナー文言・テロップをチェックします</p>
+  </div>
+
+  <!-- Input Card -->
+  <div class="card">
+    <div class="card-title">媒体を選択</div>
+    <div class="media-select" id="mediaSelect">
+      <button class="media-btn active" data-media="banner">バナー・キャッチコピー</button>
+      <button class="media-btn" data-media="video">動画・テロップ・台本</button>
+      <button class="media-btn" data-media="lp">HP・LP・チラシ</button>
+      <button class="media-btn" data-media="blog">ブログ・メルマガ・SNS長文</button>
+      <button class="media-btn" data-media="chat">チャット（LINE/Slack）</button>
+    </div>
+    <div class="media-hint" id="mediaHint">
+      フル表記パターン：すべての箇所に® が必要
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">チェックしたいテキストを貼り付け</div>
+    <textarea id="inputText" placeholder="ここにテキストを貼り付けてください...
+
+例：
+セールスいらずのお絵かきムービーで、
+認定お絵かきクリエイターになれるプログラムです。"></textarea>
+    <button class="check-btn" onclick="runCheck()">レギュレーションをチェックする</button>
+  </div>
+
+  <!-- Result Card -->
+  <div class="card result-card" id="resultCard">
+
+    <!-- Verdict -->
+    <div class="verdict" id="verdictBox">
+      <div class="verdict-icon" id="verdictIcon"></div>
+      <div class="verdict-text">
+        <h2 id="verdictTitle"></h2>
+        <p id="verdictSub"></p>
+      </div>
+    </div>
+
+    <!-- Violations -->
+    <div id="violationsSection" style="display:none">
+      <div class="section-label">
+        違反箇所
+        <span class="counter-badge" id="violationCount"></span>
+      </div>
+      <div class="violations-list" id="violationsList"></div>
+      <hr class="divider">
+      <div class="section-label">修正済み全文</div>
+      <div class="corrected-text" id="correctedText">
+        <button class="copy-btn" onclick="copyFixed()">コピー</button>
+        <span id="correctedContent"></span>
+      </div>
+    </div>
+
+    <!-- Media notes -->
+    <div id="mediaNotesSection"></div>
+
+  </div>
+
+</div>
+
+<script>
+// ---- Media config ----
+const MEDIA_CONFIG = {
+  banner: {
+    label: 'バナー・キャッチコピー',
+    pattern: 'full',
+    hint: 'フル表記パターン：すべての箇所に® が必要',
+    requiresDeclaration: false,
+    declarationNote: null
+  },
+  video: {
+    label: '動画・テロップ・台本',
+    pattern: 'hybrid',
+    hint: 'ハイブリッドパターン：冒頭だけ® 付き、中身はカギカッコのみ、末尾に権利宣言文が必要',
+    requiresDeclaration: true,
+    declarationNote: '動画の場合、冒頭と末尾に®表記のサンドイッチ形式、概要欄にも権利宣言文が必要です。'
+  },
+  lp: {
+    label: 'HP・LP・チラシ',
+    pattern: 'hybrid',
+    hint: 'ハイブリッドパターン：冒頭だけ® 付き、中身はカギカッコのみ、末尾に権利宣言文が必要',
+    requiresDeclaration: true,
+    declarationNote: 'ページ下部（フッター等）に権利宣言文を入れてください。'
+  },
+  blog: {
+    label: 'ブログ・メルマガ・SNS長文',
+    pattern: 'declaration',
+    hint: '一括宣言パターン：文中はカギカッコのみ（®不要）、末尾に権利宣言文が必要',
+    requiresDeclaration: true,
+    declarationNote: '文末に権利宣言文を入れてください。'
+  },
+  chat: {
+    label: 'チャット（LINE/Slack）',
+    pattern: 'full',
+    hint: 'フル表記パターン：メッセージごとに® 付きで記載',
+    requiresDeclaration: false,
+    declarationNote: null
+  }
+};
+
+const DECLARATION_TEXT = '※「お絵かきムービー」「お絵かきクリエイター」は株式会社アクアフィールドの登録商標です。';
+
+let currentMedia = 'banner';
+
+// Media buttons
+document.querySelectorAll('.media-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.media-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentMedia = btn.dataset.media;
+    document.getElementById('mediaHint').textContent = MEDIA_CONFIG[currentMedia].hint;
+  });
+});
+
+// ---- Check logic ----
+function runCheck() {
+  const text = document.getElementById('inputText').value.trim();
+  if (!text) {
+    alert('テキストを入力してください。');
+    return;
+  }
+
+  const media = MEDIA_CONFIG[currentMedia];
+  const violations = [];
+  let fixed = text;
+
+  // 1. お絵描き (漢字NG)
+  const kanjiMatches = [...text.matchAll(/お絵描き/g)];
+  kanjiMatches.forEach(m => {
+    violations.push({
+      rule: '漢字表記NG',
+      bad: m[0],
+      good: 'お絵かき',
+      context: getContext(text, m.index, m[0].length),
+      desc: '「お絵かき」はひらがな表記が正しいです。「描き」（漢字）はNGです。'
+    });
+  });
+  fixed = fixed.replace(/お絵描き/g, 'お絵かき');
+
+  // 2. カタカナ・英字 表記揺れ
+  const katakanaNG = /オエカキム[ーー－]ビ[ーー]/g;
+  const kMatches = [...text.matchAll(katakanaNG)];
+  kMatches.forEach(m => {
+    violations.push({
+      rule: '表記揺れ（カタカナ）',
+      bad: m[0],
+      good: '「お絵かきムービー®」',
+      context: getContext(text, m.index, m[0].length),
+      desc: 'カタカナ表記はNGです。正しくは「お絵かきムービー®」です。'
+    });
+  });
+
+  // 3. 略称NG
+  const abbrevMatches = [...text.matchAll(/お絵ム[ーー]/g)];
+  abbrevMatches.forEach(m => {
+    violations.push({
+      rule: '略称NG',
+      bad: m[0],
+      good: '「お絵かきムービー®」',
+      context: getContext(text, m.index, m[0].length),
+      desc: '「お絵ムー」などの略称はNGです。正式名称「お絵かきムービー®」を使用してください。'
+    });
+  });
+
+  // 4. 認定 NG
+  const ninteMatches = [...text.matchAll(/認定お絵かきクリエイター/g)];
+  ninteMatches.forEach(m => {
+    violations.push({
+      rule: '「認定」の使用NG',
+      bad: m[0],
+      good: '「お絵かきクリエイター®」',
+      context: getContext(text, m.index, m[0].length),
+      desc: '「認定」という接頭語を付けるのはNGです。正しくは「お絵かきクリエイター®」です。'
+    });
+  });
+  fixed = fixed.replace(/認定お絵かきクリエイター/g, '「お絵かきクリエイター®」');
+
+  // 5. カギカッコなし・®なし チェック（正規化されたテキストに対して）
+  // まず一時的にfixedを使って残りのチェックを行う
+  const tempFixed = fixed;
+
+  // --- お絵かきムービー のチェック ---
+  // まずカギカッコ+®の完全形を探す
+  // パターン: カギカッコあり®あり 「お絵かきムービー®」→ OK (full/hybrid冒頭)
+  // カギカッコあり®なし 「お絵かきムービー」→ OK (hybrid中/declaration)
+  // カギカッコなし（前後確認） → NG
+
+  // お絵かきムービー を含むすべての位置を検出
+  const movieRegex = /お絵かきムービー/g;
+  let movieMatch;
+  while ((movieMatch = movieRegex.exec(tempFixed)) !== null) {
+    const idx = movieMatch.index;
+    const len = movieMatch[0].length;
+    const before = tempFixed[idx - 1];
+    const after2 = tempFixed.substring(idx + len, idx + len + 3); // 「®」or「」etc
+
+    const hasBracketBefore = before === '「';
+    const afterChar = tempFixed[idx + len];
+    const hasBracketAfter = afterChar === '」';
+    const hasRegistered = tempFixed[idx + len] === '®' || (tempFixed[idx + len] === '」' && tempFixed[idx + len + 1] === '®');
+
+    // カギカッコなし
+    if (!hasBracketBefore) {
+      const context = getContext(tempFixed, idx, len);
+      violations.push({
+        rule: 'カギカッコなし',
+        bad: extractBadPhrase(tempFixed, idx, len),
+        good: media.pattern === 'full' ? '「お絵かきムービー®」' : '「お絵かきムービー®」（冒頭）または「お絵かきムービー」（中盤以降）',
+        context: context,
+        desc: '「お絵かきムービー」は必ずカギカッコ（「」）で囲んでください。'
+      });
+      fixed = fixTrademark(fixed, 'お絵かきムービー', media.pattern);
+      continue;
+    }
+
+    // カギカッコあり、®チェック
+    const hasReg = tempFixed[idx + len] === '®';
+    const bracketPlusReg = hasBracketAfter; // 「お絵かきムービー」の後
+
+    if (media.pattern === 'full' && !hasReg) {
+      violations.push({
+        rule: '® マーク欠落',
+        bad: '「お絵かきムービー」',
+        good: '「お絵かきムービー®」',
+        context: getContext(tempFixed, idx - 1, len + 2),
+        desc: 'バナー・キャッチコピーはフル表記パターンのため、すべての箇所に®が必要です。'
+      });
+      fixed = fixed.replace(/「お絵かきムービー」/g, '「お絵かきムービー®」');
+    }
+  }
+
+  // --- お絵かきクリエイター のチェック ---
+  const creatorRegex = /お絵かきクリエイター/g;
+  let creatorMatch;
+  const tempFixed2 = tempFixed;
+  while ((creatorMatch = creatorRegex.exec(tempFixed2)) !== null) {
+    const idx = creatorMatch.index;
+    const len = creatorMatch[0].length;
+    const before = tempFixed2[idx - 1];
+    const hasBracketBefore = before === '「';
+    const hasReg = tempFixed2[idx + len] === '®';
+
+    if (!hasBracketBefore) {
+      violations.push({
+        rule: 'カギカッコなし',
+        bad: extractBadPhrase(tempFixed2, idx, len),
+        good: media.pattern === 'full' ? '「お絵かきクリエイター®」' : '「お絵かきクリエイター®」（冒頭）または「お絵かきクリエイター」（中盤以降）',
+        context: getContext(tempFixed2, idx, len),
+        desc: '「お絵かきクリエイター」は必ずカギカッコ（「」）で囲んでください。'
+      });
+      fixed = fixTrademark(fixed, 'お絵かきクリエイター', media.pattern);
+      continue;
+    }
+
+    if (media.pattern === 'full' && !hasReg) {
+      violations.push({
+        rule: '® マーク欠落',
+        bad: '「お絵かきクリエイター」',
+        good: '「お絵かきクリエイター®」',
+        context: getContext(tempFixed2, idx - 1, len + 2),
+        desc: 'バナー・キャッチコピーはフル表記パターンのため、すべての箇所に®が必要です。'
+      });
+      fixed = fixed.replace(/「お絵かきクリエイター」/g, '「お絵かきクリエイター®」');
+    }
+  }
+
+  // 6. 複合語チェック（カギカッコ済みでも前後に文字がついていないか）
+  // 「お絵かきムービー®」起業 → 「お絵かきムービー®」 起業（スペースなしでもOKだが複合語になっていないか確認）
+  // 実際にNG: セールスいらずのお絵かきムービー → すでにカギカッコなしで検出済み
+  // 追加チェック: 」の直後に連続した漢字・ひらがなが続く場合（スペースなし）
+  const compoundAfter = /」(®)?([^\s\n「」。、！？!?…・ 　ーー\-（）()【】\[\]「」『』、。\d])/g;
+  let compMatch;
+  const checkCompound = text; // オリジナルテキストで確認
+  while ((compMatch = compoundAfter.exec(checkCompound)) !== null) {
+    // 商標の後に何かついているか確認
+    const pos = compMatch.index;
+    // 直前がムービーかクリエイターの 」かチェック
+    const before20 = checkCompound.substring(Math.max(0, pos - 20), pos + 1);
+    if (before20.includes('お絵かきムービー') || before20.includes('お絵かきクリエイター')) {
+      const afterChar = compMatch[2];
+      violations.push({
+        rule: '複合語NG（後ろ）',
+        bad: '「...」' + afterChar + '...',
+        good: '「...」 ' + afterChar + '...（スペースや句読点で区切る）',
+        context: getContext(checkCompound, pos, 5),
+        desc: '商標名の直後に言葉を繋げて複合語のように扱うのはNGです。区切りを入れてください。'
+      });
+    }
+  }
+
+  // 権利宣言文チェック
+  const hasDeclaration = text.includes('株式会社アクアフィールドの登録商標') || text.includes('登録商標');
+
+  // ---- Render results ----
+  const resultCard = document.getElementById('resultCard');
+  resultCard.style.display = 'block';
+
+  // Deduplicate violations by rule+bad
+  const seen = new Set();
+  const uniqueViolations = violations.filter(v => {
+    const key = v.rule + v.bad;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  const verdictBox = document.getElementById('verdictBox');
+  const verdictIcon = document.getElementById('verdictIcon');
+  const verdictTitle = document.getElementById('verdictTitle');
+  const verdictSub = document.getElementById('verdictSub');
+
+  if (uniqueViolations.length === 0) {
+    verdictBox.className = 'verdict pass';
+    verdictIcon.textContent = '✅';
+    verdictTitle.textContent = '合格';
+    verdictSub.textContent = '違反は見つかりませんでした。問題ありません！';
+    document.getElementById('violationsSection').style.display = 'none';
+  } else {
+    verdictBox.className = 'verdict fail';
+    verdictIcon.textContent = '⚠️';
+    verdictTitle.textContent = `要修正（${uniqueViolations.length}件の違反）`;
+    verdictSub.textContent = '以下の違反箇所を修正してください。';
+
+    document.getElementById('violationsSection').style.display = 'block';
+    document.getElementById('violationCount').textContent = uniqueViolations.length;
+
+    const list = document.getElementById('violationsList');
+    list.innerHTML = '';
+    uniqueViolations.forEach((v, i) => {
+      list.innerHTML += `
+        <div class="violation-item">
+          <div class="violation-header">
+            <span class="violation-num">違反 ${i + 1}</span>
+            <span class="violation-rule">${v.rule}</span>
+          </div>
+          <div class="violation-body">
+            <div class="violation-row">
+              <span class="violation-label">該当箇所</span>
+              <span class="violation-content"><span class="bad-text">${escHtml(v.context)}</span></span>
+            </div>
+            <div class="violation-row">
+              <span class="violation-label">説明</span>
+              <span class="violation-content">${escHtml(v.desc)}</span>
+            </div>
+            <div class="violation-row">
+              <span class="violation-label">修正案</span>
+              <span class="violation-content"><span class="good-text">${escHtml(v.good)}</span></span>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    document.getElementById('correctedContent').textContent = fixed;
+  }
+
+  // Media notes
+  const notesSection = document.getElementById('mediaNotesSection');
+  let notes = '';
+
+  if (media.requiresDeclaration) {
+    if (!hasDeclaration) {
+      notes += `<div class="note-box" style="margin-top:16px">
+        <strong>追加対応が必要</strong>
+        ${escHtml(media.declarationNote)}<br><br>
+        <strong>権利宣言文（コピペ用）：</strong><br>
+        ${escHtml(DECLARATION_TEXT)}
+      </div>`;
+    } else {
+      notes += `<div class="note-box" style="margin-top:16px; background:#f0fdf4; border-color:#86efac; color:#166534">
+        <strong>権利宣言文</strong>
+        権利宣言文が含まれています。
+      </div>`;
+    }
+  }
+
+  notesSection.innerHTML = notes;
+
+  resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function getContext(text, idx, len) {
+  const start = Math.max(0, idx - 8);
+  const end = Math.min(text.length, idx + len + 8);
+  let ctx = text.substring(start, end);
+  if (start > 0) ctx = '...' + ctx;
+  if (end < text.length) ctx = ctx + '...';
+  return ctx;
+}
+
+function extractBadPhrase(text, idx, len) {
+  const start = Math.max(0, idx - 5);
+  const end = Math.min(text.length, idx + len + 5);
+  return text.substring(start, end);
+}
+
+function fixTrademark(text, name, pattern) {
+  // Remove existing brackets if any, then re-add properly
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  // カギカッコなし版を置換
+  const re = new RegExp(`(?<!「)${escaped}(?![」®])`, 'g');
+  if (pattern === 'full') {
+    return text.replace(re, `「${name}®」`);
+  } else {
+    return text.replace(re, `「${name}®」`);
+  }
+}
+
+function escHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function copyFixed() {
+  const content = document.getElementById('correctedContent').textContent;
+  navigator.clipboard.writeText(content).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'コピー済み！';
+    setTimeout(() => btn.textContent = 'コピー', 1500);
+  });
+}
+</script>
+</body>
+</html>
