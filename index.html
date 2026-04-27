@@ -32,28 +32,6 @@
   }
   .card-title { font-size: 13px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 14px; }
 
-  /* API Key section */
-  .api-key-bar {
-    display: flex; align-items: center; gap: 10px;
-    background: #fafafa; border: 1px solid #e5e7eb;
-    border-radius: 10px; padding: 10px 14px; margin-bottom: 20px;
-  }
-  .api-key-label { font-size: 12px; font-weight: 600; color: #6b7280; white-space: nowrap; }
-  .api-key-input {
-    flex: 1; border: none; background: transparent; font-size: 13px;
-    outline: none; color: #1a1a2e; font-family: monospace;
-  }
-  .api-key-save {
-    background: #667eea; color: white; border: none; border-radius: 7px;
-    padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer;
-    white-space: nowrap;
-  }
-  .api-key-save:hover { opacity: 0.85; }
-  .api-key-status { font-size: 11px; }
-  .api-key-status.ok { color: #16a34a; }
-  .api-key-status.ng { color: #dc2626; }
-
-  /* Media tabs */
   .media-select { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
   .media-btn {
     padding: 8px 16px; border: 2px solid #e5e7eb; border-radius: 10px;
@@ -64,7 +42,6 @@
   .media-btn.active { border-color: #667eea; background: #667eea; color: white; }
   .media-hint { font-size: 11px; color: #9ca3af; margin-top: 8px; }
 
-  /* Text input */
   textarea {
     width: 100%; min-height: 180px; border: 2px solid #e5e7eb;
     border-radius: 12px; padding: 14px 16px; font-size: 14px;
@@ -74,58 +51,18 @@
   textarea:focus { border-color: #667eea; }
   textarea::placeholder { color: #c4c9d4; }
 
-  /* Video upload area */
-  .video-upload-area {
-    border: 2px dashed #d1d5db; border-radius: 12px;
-    padding: 40px 20px; text-align: center; cursor: pointer;
-    transition: all 0.15s; position: relative;
-  }
-  .video-upload-area:hover, .video-upload-area.drag-over {
-    border-color: #667eea; background: #f5f3ff;
-  }
-  .video-upload-area input[type="file"] {
-    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-  }
-  .upload-icon { font-size: 40px; margin-bottom: 12px; }
-  .upload-title { font-size: 15px; font-weight: 600; color: #374151; margin-bottom: 6px; }
-  .upload-sub { font-size: 12px; color: #9ca3af; }
-  .upload-sub strong { color: #667eea; }
-
-  .video-preview {
-    display: none; margin-top: 16px;
-    background: #f8fafc; border-radius: 10px; padding: 14px;
-  }
-  .video-preview video { width: 100%; border-radius: 8px; max-height: 300px; }
-  .video-info { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-  .video-filename { font-size: 13px; color: #374151; font-weight: 500; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .video-remove { font-size: 12px; color: #dc2626; cursor: pointer; background: none; border: none; padding: 0; }
-
-  /* Check button */
   .check-btn {
     width: 100%; padding: 14px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white; border: none; border-radius: 12px;
     font-size: 16px; font-weight: 600; cursor: pointer;
     transition: opacity 0.15s, transform 0.1s; margin-top: 14px;
-    letter-spacing: 0.3px;
   }
   .check-btn:hover { opacity: 0.92; transform: translateY(-1px); }
   .check-btn:active { transform: translateY(0); }
-  .check-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-  /* Progress */
-  .progress-bar-wrap {
-    display: none; margin-top: 14px;
-    background: #f3f4f6; border-radius: 8px; height: 8px; overflow: hidden;
-  }
-  .progress-bar {
-    height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 8px; transition: width 0.3s; width: 0%;
-  }
-  .progress-text { text-align: center; font-size: 12px; color: #6b7280; margin-top: 6px; display: none; }
-
-  /* Result card */
   .result-card { display: none; }
+
   .verdict {
     display: flex; align-items: center; gap: 14px;
     padding: 18px 20px; border-radius: 12px; margin-bottom: 20px;
@@ -146,17 +83,11 @@
     border-radius: 8px; padding: 14px 16px; background: #fffbeb;
   }
   .violation-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-  .violation-num {
-    background: #f59e0b; color: white; font-size: 11px; font-weight: 700;
-    padding: 2px 7px; border-radius: 6px;
-  }
+  .violation-num { background: #f59e0b; color: white; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; }
   .violation-rule { font-size: 12px; font-weight: 600; color: #92400e; }
   .violation-body { display: flex; flex-direction: column; gap: 8px; }
   .violation-row { display: flex; gap: 10px; align-items: flex-start; }
-  .violation-label {
-    font-size: 11px; font-weight: 600; color: #9ca3af;
-    min-width: 60px; padding-top: 2px; text-transform: uppercase; letter-spacing: 0.5px;
-  }
+  .violation-label { font-size: 11px; font-weight: 600; color: #9ca3af; min-width: 60px; padding-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
   .violation-content { font-size: 13px; line-height: 1.6; }
   .bad-text { background: #fee2e2; color: #dc2626; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 13px; }
   .good-text { background: #dcfce7; color: #16a34a; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 13px; }
@@ -171,7 +102,6 @@
     position: absolute; top: 10px; right: 10px;
     background: #667eea; color: white; border: none; border-radius: 7px;
     padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer;
-    transition: opacity 0.15s;
   }
   .copy-btn:hover { opacity: 0.85; }
 
@@ -183,14 +113,6 @@
   .note-box strong { display: block; margin-bottom: 6px; font-size: 12px; color: #1e40af; text-transform: uppercase; letter-spacing: 0.5px; }
   .divider { border: none; border-top: 1px solid #f3f4f6; margin: 20px 0; }
   .counter-badge { background: #ef4444; color: white; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 10px; margin-left: 6px; }
-
-  /* AI result (raw markdown-ish) */
-  .ai-result {
-    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
-    padding: 20px; font-size: 14px; line-height: 1.9;
-    white-space: pre-wrap; word-break: break-word; color: #1a1a2e;
-  }
-  .frames-info { font-size: 12px; color: #9ca3af; margin-bottom: 12px; }
 </style>
 </head>
 <body>
@@ -199,64 +121,29 @@
   <div class="header">
     <div class="logo-badge">お絵かきクリエイターズ</div>
     <h1>レギュレーションチェッカー</h1>
-    <p>台本・コピー・バナー文言・動画テロップをチェックします</p>
+    <p>台本・コピー・バナー文言・テロップをチェックします</p>
   </div>
 
-  <!-- API Key -->
-  <div class="api-key-bar">
-    <span class="api-key-label">Claude API Key</span>
-    <input class="api-key-input" type="password" id="apiKeyInput" placeholder="sk-ant-..." />
-    <button class="api-key-save" onclick="saveApiKey()">保存</button>
-    <span class="api-key-status" id="apiKeyStatus"></span>
-  </div>
-
-  <!-- Media Selection -->
   <div class="card">
     <div class="card-title">媒体を選択</div>
     <div class="media-select" id="mediaSelect">
       <button class="media-btn active" data-media="banner">バナー・キャッチコピー</button>
-      <button class="media-btn" data-media="video">動画・テロップ</button>
+      <button class="media-btn" data-media="video">動画・台本・テロップ</button>
       <button class="media-btn" data-media="lp">HP・LP・チラシ</button>
     </div>
     <div class="media-hint" id="mediaHint">フル表記パターン：すべての箇所に® が必要</div>
   </div>
 
-  <!-- Input -->
   <div class="card">
     <div class="card-title" id="inputLabel">チェックしたいテキストを貼り付け</div>
-
-    <!-- Text input (banner / lp) -->
-    <div id="textInputArea">
-      <textarea id="inputText" placeholder="ここにテキストを貼り付けてください...
+    <textarea id="inputText" placeholder="ここにテキストを貼り付けてください...
 
 例：
 セールスいらずのお絵かきムービーで、
 認定お絵かきクリエイターになれるプログラムです。"></textarea>
-    </div>
-
-    <!-- Video input -->
-    <div id="videoInputArea" style="display:none;">
-      <div class="video-upload-area" id="dropZone">
-        <input type="file" id="videoFile" accept="video/*" onchange="handleVideoFile(this.files[0])">
-        <div class="upload-icon">🎬</div>
-        <div class="upload-title">動画ファイルをドラッグ＆ドロップ</div>
-        <div class="upload-sub">または<strong>クリックしてファイルを選択</strong><br>Google Drive からダウンロードしたファイルをそのままドロップできます</div>
-      </div>
-      <div class="video-preview" id="videoPreview">
-        <video id="videoPlayer" controls muted></video>
-        <div class="video-info">
-          <span class="video-filename" id="videoFilename"></span>
-          <button class="video-remove" onclick="removeVideo()">✕ 削除</button>
-        </div>
-      </div>
-    </div>
-
-    <button class="check-btn" id="checkBtn" onclick="runCheck()">レギュレーションをチェックする</button>
-    <div class="progress-bar-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
-    <div class="progress-text" id="progressText"></div>
+    <button class="check-btn" onclick="runCheck()">レギュレーションをチェックする</button>
   </div>
 
-  <!-- Result -->
   <div class="card result-card" id="resultCard">
     <div class="verdict" id="verdictBox">
       <div class="verdict-icon" id="verdictIcon"></div>
@@ -266,7 +153,6 @@
       </div>
     </div>
 
-    <!-- Rule-based violations -->
     <div id="violationsSection" style="display:none">
       <div class="section-label">違反箇所 <span class="counter-badge" id="violationCount"></span></div>
       <div class="violations-list" id="violationsList"></div>
@@ -278,159 +164,49 @@
       </div>
     </div>
 
-    <!-- AI video result -->
-    <div id="aiResultSection" style="display:none">
-      <div class="frames-info" id="framesInfo"></div>
-      <div class="ai-result" id="aiResultContent"></div>
-    </div>
-
     <div id="mediaNotesSection"></div>
   </div>
 
 </div>
 
-<!-- Hidden video for frame extraction -->
-<video id="hiddenVideo" style="display:none" muted></video>
-<canvas id="frameCanvas" style="display:none"></canvas>
-
 <script>
-// ---- State ----
 let currentMedia = 'banner';
-let currentVideoFile = null;
 
 const MEDIA_CONFIG = {
   banner: {
-    label: 'バナー・キャッチコピー', pattern: 'full',
+    pattern: 'full',
     hint: 'フル表記パターン：すべての箇所に® が必要',
-    requiresDeclaration: false
+    requiresDeclaration: false,
+    placeholder: 'ここにテキストを貼り付けてください...\n\n例：\nセールスいらずのお絵かきムービーで、\n認定お絵かきクリエイターになれるプログラムです。'
   },
   video: {
-    label: '動画・テロップ', pattern: 'hybrid',
+    pattern: 'hybrid',
     hint: 'ハイブリッドパターン：冒頭だけ® 付き・中身はカギカッコのみ・末尾に権利宣言文が必要',
-    requiresDeclaration: true
+    requiresDeclaration: true,
+    placeholder: '動画の台本またはテロップのテキストを貼り付けてください...\n\n例：\n【冒頭テロップ】\nお絵かきムービーで起業しよう！\n\n【中盤ナレーション】\nお絵かきクリエイターになるための...'
   },
   lp: {
-    label: 'HP・LP・チラシ', pattern: 'hybrid',
+    pattern: 'hybrid',
     hint: 'ハイブリッドパターン：冒頭だけ® 付き・中身はカギカッコのみ・末尾に権利宣言文が必要',
-    requiresDeclaration: true
+    requiresDeclaration: true,
+    placeholder: 'ここにテキストを貼り付けてください...\n\n例：\n「お絵かきムービー」で集客を自動化。\nお絵かきクリエイターとして独立しませんか？'
   }
 };
 
 const DECLARATION_TEXT = '※「お絵かきムービー」「お絵かきクリエイター」は株式会社アクアフィールドの登録商標です。';
 
-const REGULATION_PROMPT = `あなたは「お絵かきクリエイターズ」案件のレギュレーション審査員です。
-以下の動画フレーム画像を分析し、画面内のテキスト（テロップ・タイトル・字幕・テキスト表示すべて）を読み取り、商標レギュレーション違反を厳密にチェックしてください。
-
-【チェックルール】
-
-1. 「お絵かきムービー」「お絵かきクリエイター」は必ずカギカッコ（「」）で囲む
-   - NG: お絵かきムービー / OK: 「お絵かきムービー®」または「お絵かきムービー」
-
-2. ® マーク
-   - 動画はハイブリッドパターン：冒頭フレームだけ®付き、中盤以降はカギカッコのみでOK
-   - ただし®なしでカギカッコもなければNG
-
-3. 漢字NG：「お絵描き」→「お絵かき」が正しい（「かき」はひらがな）
-
-4. カタカナ・略称NG：「オエカキムービー」「お絵ムー」等はNG
-
-5. 複合語NG：商標名の前後に別の言葉をくっつけて一語のように使うのはNG
-   - NG例：「お絵かきムービー起業」「セールスいらずのお絵かきムービー」（カギカッコがない）
-
-6. 「認定お絵かきクリエイター」→「認定」は不要
-
-【出力形式】
-## 総合判定
-「合格」または「要修正（X件の違反）」
-
-## 違反箇所
-違反がある場合、フレーム番号・発見テキスト・違反ルール・修正案を箇条書きで記載
-
-## 補足
-概要欄への権利宣言文の必要性など、追加で必要な対応を記載
-
-テロップが見つからないフレームは無視してください。テキストのみに集中してチェックしてください。`;
-
-// ---- API Key ----
-window.addEventListener('load', () => {
-  const saved = localStorage.getItem('claudeApiKey');
-  if (saved) {
-    document.getElementById('apiKeyInput').value = saved;
-    document.getElementById('apiKeyStatus').textContent = '✓ 保存済み';
-    document.getElementById('apiKeyStatus').className = 'api-key-status ok';
-  }
-});
-
-function saveApiKey() {
-  const key = document.getElementById('apiKeyInput').value.trim();
-  if (!key) return;
-  localStorage.setItem('claudeApiKey', key);
-  document.getElementById('apiKeyStatus').textContent = '✓ 保存しました';
-  document.getElementById('apiKeyStatus').className = 'api-key-status ok';
-  setTimeout(() => {
-    document.getElementById('apiKeyStatus').textContent = '✓ 保存済み';
-  }, 1500);
-}
-
-// ---- Media tabs ----
 document.querySelectorAll('.media-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.media-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentMedia = btn.dataset.media;
-    document.getElementById('mediaHint').textContent = MEDIA_CONFIG[currentMedia].hint;
-
-    if (currentMedia === 'video') {
-      document.getElementById('textInputArea').style.display = 'none';
-      document.getElementById('videoInputArea').style.display = 'block';
-      document.getElementById('inputLabel').textContent = '動画ファイルをアップロード';
-    } else {
-      document.getElementById('textInputArea').style.display = 'block';
-      document.getElementById('videoInputArea').style.display = 'none';
-      document.getElementById('inputLabel').textContent = 'チェックしたいテキストを貼り付け';
-    }
+    const cfg = MEDIA_CONFIG[currentMedia];
+    document.getElementById('mediaHint').textContent = cfg.hint;
+    document.getElementById('inputText').placeholder = cfg.placeholder;
   });
 });
 
-// ---- Drag & Drop ----
-const dropZone = document.getElementById('dropZone');
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if (file && file.type.startsWith('video/')) handleVideoFile(file);
-});
-
-function handleVideoFile(file) {
-  if (!file) return;
-  currentVideoFile = file;
-  const url = URL.createObjectURL(file);
-  const player = document.getElementById('videoPlayer');
-  player.src = url;
-  document.getElementById('videoFilename').textContent = file.name;
-  document.getElementById('videoPreview').style.display = 'block';
-}
-
-function removeVideo() {
-  currentVideoFile = null;
-  document.getElementById('videoPlayer').src = '';
-  document.getElementById('videoPreview').style.display = 'none';
-  document.getElementById('videoFile').value = '';
-}
-
-// ---- Main check ----
-async function runCheck() {
-  if (currentMedia === 'video') {
-    await runVideoCheck();
-  } else {
-    runTextCheck();
-  }
-}
-
-// ---- Text check (rule-based) ----
-function runTextCheck() {
+function runCheck() {
   const text = document.getElementById('inputText').value.trim();
   if (!text) { alert('テキストを入力してください。'); return; }
 
@@ -460,87 +236,32 @@ function runTextCheck() {
   });
   fixed = fixed.replace(/認定お絵かきクリエイター/g, '「お絵かきクリエイター®」');
 
-  // 5. カギカッコなし & ®チェック
-  const tmpText = fixed;
+  // 5. カギカッコ・® チェック
+  checkTrademark(fixed, 'お絵かきムービー', media.pattern, violations);
+  checkTrademark(fixed, 'お絵かきクリエイター', media.pattern, violations);
+  fixed = applyFix(fixed, 'お絵かきムービー', media.pattern);
+  fixed = applyFix(fixed, 'お絵かきクリエイター', media.pattern);
 
-  checkTrademark(tmpText, 'お絵かきムービー', media.pattern, violations);
-  checkTrademark(tmpText, 'お絵かきクリエイター', media.pattern, violations);
-  fixed = applyTrademarkFix(fixed, 'お絵かきムービー', media.pattern);
-  fixed = applyTrademarkFix(fixed, 'お絵かきクリエイター', media.pattern);
-
-  // Dedupe
+  // 重複排除
   const seen = new Set();
   const uniq = violations.filter(v => { const k = v.rule + v.bad; if (seen.has(k)) return false; seen.add(k); return true; });
 
-  showTextResult(uniq, fixed, media, text);
-}
-
-function checkTrademark(text, name, pattern, violations) {
-  const re = new RegExp(name, 'g');
-  let m;
-  while ((m = re.exec(text)) !== null) {
-    const idx = m.index;
-    const len = m[0].length;
-    const before = text[idx - 1];
-    const after = text[idx + len];
-    const hasBracket = before === '「';
-    const hasReg = after === '®';
-
-    if (!hasBracket) {
-      violations.push({
-        rule: 'カギカッコなし', bad: ctxShort(text, idx, len),
-        good: pattern === 'full' ? `「${name}®」` : `「${name}®」（冒頭）または「${name}」（中盤）`,
-        context: ctx(text, idx, len),
-        desc: `「${name}」は必ずカギカッコ（「」）で囲んでください。`
-      });
-      return;
-    }
-
-    if (pattern === 'full' && !hasReg) {
-      violations.push({
-        rule: '® マーク欠落', bad: `「${name}」`,
-        good: `「${name}®」`,
-        context: ctx(text, idx - 1, len + 2),
-        desc: 'バナー・キャッチコピーはフル表記のため、すべての箇所に®が必要です。'
-      });
-    }
-  }
-}
-
-function applyTrademarkFix(text, name, pattern) {
-  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const re = new RegExp(`(?<!「)${escaped}(?![」®])`, 'g');
-  return text.replace(re, `「${name}®」`);
-}
-
-function ctx(text, idx, len) {
-  const s = Math.max(0, idx - 8), e = Math.min(text.length, idx + len + 8);
-  return (s > 0 ? '...' : '') + text.substring(s, e) + (e < text.length ? '...' : '');
-}
-function ctxShort(text, idx, len) {
-  const s = Math.max(0, idx - 4), e = Math.min(text.length, idx + len + 4);
-  return text.substring(s, e);
-}
-
-function showTextResult(violations, fixed, media, origText) {
+  // 結果表示
   const resultCard = document.getElementById('resultCard');
   resultCard.style.display = 'block';
+  const hasDeclaration = text.includes('株式会社アクアフィールドの登録商標') || text.includes('登録商標');
 
-  document.getElementById('aiResultSection').style.display = 'none';
-
-  const hasDeclaration = origText.includes('株式会社アクアフィールドの登録商標') || origText.includes('登録商標');
-
-  if (violations.length === 0) {
+  if (uniq.length === 0) {
     setVerdict('pass', '✅', '合格', '違反は見つかりませんでした。問題ありません！');
     document.getElementById('violationsSection').style.display = 'none';
   } else {
-    setVerdict('fail', '⚠️', `要修正（${violations.length}件の違反）`, '以下の違反箇所を修正してください。');
+    setVerdict('fail', '⚠️', `要修正（${uniq.length}件の違反）`, '以下の違反箇所を修正してください。');
     document.getElementById('violationsSection').style.display = 'block';
-    document.getElementById('violationCount').textContent = violations.length;
+    document.getElementById('violationCount').textContent = uniq.length;
 
     const list = document.getElementById('violationsList');
     list.innerHTML = '';
-    violations.forEach((v, i) => {
+    uniq.forEach((v, i) => {
       list.innerHTML += `
         <div class="violation-item">
           <div class="violation-header">
@@ -557,7 +278,6 @@ function showTextResult(violations, fixed, media, origText) {
     document.getElementById('correctedContent').textContent = fixed;
   }
 
-  // Media notes
   let notes = '';
   if (media.requiresDeclaration) {
     if (!hasDeclaration) {
@@ -570,165 +290,51 @@ function showTextResult(violations, fixed, media, origText) {
   resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// ---- Video check (AI) ----
-async function runVideoCheck() {
-  if (!currentVideoFile) { alert('動画ファイルをアップロードしてください。'); return; }
+function checkTrademark(text, name, pattern, violations) {
+  const re = new RegExp(name, 'g');
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    const idx = m.index;
+    const len = m[0].length;
+    const hasBracket = text[idx - 1] === '「';
+    const hasReg = text[idx + len] === '®';
 
-  const apiKey = localStorage.getItem('claudeApiKey') || document.getElementById('apiKeyInput').value.trim();
-  if (!apiKey) {
-    alert('Claude API キーを入力して「保存」してください。');
-    document.getElementById('apiKeyInput').focus();
-    return;
-  }
-
-  const btn = document.getElementById('checkBtn');
-  btn.disabled = true;
-  btn.textContent = '分析中...';
-  document.getElementById('progressWrap').style.display = 'block';
-  document.getElementById('progressText').style.display = 'block';
-  setProgress(5, '動画を読み込み中...');
-
-  try {
-    const frames = await extractFrames(currentVideoFile);
-    setProgress(50, `${frames.length}フレームを抽出しました。AIが分析中...`);
-
-    const result = await callClaudeWithFrames(apiKey, frames);
-    setProgress(100, '分析完了');
-
-    showVideoResult(result, frames.length);
-  } catch (e) {
-    alert('エラーが発生しました：' + e.message);
-    console.error(e);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'レギュレーションをチェックする';
-    document.getElementById('progressWrap').style.display = 'none';
-    document.getElementById('progressText').style.display = 'none';
-  }
-}
-
-function setProgress(pct, text) {
-  document.getElementById('progressBar').style.width = pct + '%';
-  document.getElementById('progressText').textContent = text;
-}
-
-async function extractFrames(file) {
-  return new Promise((resolve, reject) => {
-    const video = document.getElementById('hiddenVideo');
-    const canvas = document.getElementById('frameCanvas');
-    const url = URL.createObjectURL(file);
-    const frames = [];
-
-    video.src = url;
-    video.load();
-
-    video.addEventListener('loadedmetadata', async () => {
-      const duration = video.duration;
-      const MAX_FRAMES = 20;
-      // フレームを均等に抽出（最大20枚）
-      const interval = Math.max(1, duration / MAX_FRAMES);
-      const times = [];
-      for (let t = 0; t < duration; t += interval) times.push(t);
-      if (times.length > MAX_FRAMES) times.length = MAX_FRAMES;
-
-      const ctx2d = canvas.getContext('2d');
-      let i = 0;
-
-      const captureNext = () => {
-        if (i >= times.length) {
-          URL.revokeObjectURL(url);
-          resolve(frames);
-          return;
-        }
-        video.currentTime = times[i];
-      };
-
-      video.addEventListener('seeked', () => {
-        // フレームサイズを縮小（API制限対策）
-        const maxW = 800;
-        const scale = Math.min(1, maxW / video.videoWidth);
-        canvas.width = Math.round(video.videoWidth * scale);
-        canvas.height = Math.round(video.videoHeight * scale);
-        ctx2d.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
-        frames.push(dataUrl.split(',')[1]); // base64のみ
-        setProgress(10 + Math.round((i / times.length) * 35), `フレーム ${i + 1}/${times.length} を抽出中...`);
-        i++;
-        captureNext();
+    if (!hasBracket) {
+      violations.push({
+        rule: 'カギカッコなし',
+        bad: text.substring(Math.max(0, idx - 4), idx + len + 4),
+        good: pattern === 'full' ? `「${name}®」` : `「${name}®」（冒頭）または「${name}」（中盤）`,
+        context: ctx(text, idx, len),
+        desc: `「${name}」は必ずカギカッコ（「」）で囲んでください。`
       });
-
-      captureNext();
-    });
-
-    video.addEventListener('error', () => reject(new Error('動画の読み込みに失敗しました。')));
-  });
+      return;
+    }
+    if (pattern === 'full' && !hasReg) {
+      violations.push({
+        rule: '® マーク欠落',
+        bad: `「${name}」`,
+        good: `「${name}®」`,
+        context: ctx(text, idx - 1, len + 2),
+        desc: 'バナー・キャッチコピーはフル表記のため、すべての箇所に®が必要です。'
+      });
+    }
+  }
 }
 
-async function callClaudeWithFrames(apiKey, frames) {
-  // フレーム数が多い場合は間引く（APIコスト削減・制限対策）
-  const MAX_API_FRAMES = 10;
-  let selectedFrames = frames;
-  if (frames.length > MAX_API_FRAMES) {
-    const step = frames.length / MAX_API_FRAMES;
-    selectedFrames = Array.from({ length: MAX_API_FRAMES }, (_, i) => frames[Math.floor(i * step)]);
+function applyFix(text, name, pattern) {
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  text = text.replace(new RegExp(`(?<!「)${escaped}(?![」®])`, 'g'), `「${name}®」`);
+  if (pattern === 'full') {
+    text = text.replace(new RegExp(`「${escaped}」(?!®)`, 'g'), `「${name}®」`);
   }
-
-  const content = [
-    ...selectedFrames.map((b64, idx) => ({
-      type: 'image',
-      source: { type: 'base64', media_type: 'image/jpeg', data: b64 }
-    })),
-    { type: 'text', text: `上記は動画から抽出した${selectedFrames.length}枚のフレーム画像です（時系列順）。\n\n${REGULATION_PROMPT}` }
-  ];
-
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-opus-4-6',
-      max_tokens: 2048,
-      messages: [{ role: 'user', content }]
-    })
-  });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || `APIエラー (${res.status})`);
-  }
-
-  const data = await res.json();
-  return data.content[0].text;
+  return text;
 }
 
-function showVideoResult(aiText, totalFrames) {
-  const resultCard = document.getElementById('resultCard');
-  resultCard.style.display = 'block';
-
-  document.getElementById('violationsSection').style.display = 'none';
-  document.getElementById('aiResultSection').style.display = 'block';
-
-  const isPass = aiText.includes('合格') && !aiText.includes('要修正') && !aiText.includes('違反');
-  if (isPass) {
-    setVerdict('pass', '✅', '合格', 'テロップにレギュレーション違反は見つかりませんでした。');
-  } else {
-    setVerdict('fail', '⚠️', '要修正', '以下の詳細を確認してください。');
-  }
-
-  document.getElementById('framesInfo').textContent = `動画から ${totalFrames} フレームを抽出し、代表 ${Math.min(totalFrames, 10)} フレームをAIが分析しました。`;
-  document.getElementById('aiResultContent').textContent = aiText;
-
-  // 権利宣言文の注意
-  document.getElementById('mediaNotesSection').innerHTML = `<div class="note-box" style="margin-top:16px"><strong>動画の追加要件</strong>概要欄に以下の権利宣言文を必ず入れてください。<br><br>${esc(DECLARATION_TEXT)}</div>`;
-
-  resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+function ctx(text, idx, len) {
+  const s = Math.max(0, idx - 8), e = Math.min(text.length, idx + len + 8);
+  return (s > 0 ? '...' : '') + text.substring(s, e) + (e < text.length ? '...' : '');
 }
 
-// ---- Helpers ----
 function setVerdict(type, icon, title, sub) {
   document.getElementById('verdictBox').className = 'verdict ' + type;
   document.getElementById('verdictIcon').textContent = icon;
