@@ -199,7 +199,8 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0;}
     <div class="clabel">媒体を選択</div>
     <div class="tabs" id="tabs">
       <button class="tab on" data-m="banner">📌 バナー・キャッチコピー</button>
-      <button class="tab" data-m="video">🎬 動画・台本・テロップ</button>
+      <button class="tab" data-m="video">🎬 動画</button>
+      <button class="tab" data-m="script">📝 台本</button>
       <button class="tab" data-m="lp">📄 HP・LP・チラシ</button>
     </div>
     <div class="hint" id="hint">フル表記パターン：すべての箇所に® が必要</div>
@@ -306,9 +307,10 @@ let media = 'banner';
 let pfX = false, pfMeta = false;
 
 const MCFG = {
-  banner:{ pattern:'full',  hint:'フル表記パターン：すべての箇所に® が必要', decl:false },
-  video: { pattern:'hybrid',hint:'ハイブリッドパターン：冒頭だけ® 付き・中身はカギカッコのみ・末尾に権利宣言文が必要', decl:true },
-  lp:    { pattern:'hybrid',hint:'ハイブリッドパターン：冒頭だけ® 付き・中身はカギカッコのみ・末尾に権利宣言文が必要', decl:true }
+  banner:{ pattern:'full',   hint:'フル表記パターン：すべての箇所に® が必要', decl:false },
+  video: { pattern:'hybrid', hint:'ハイブリッドパターン：冒頭だけ® 付き・中身はカギカッコのみ・末尾に権利宣言文が必要', decl:true },
+  script:{ pattern:'hybrid', hint:'ハイブリッドパターン：冒頭だけ® 付き・中身はカギカッコのみ・末尾に権利宣言文が必要', decl:true },
+  lp:    { pattern:'hybrid', hint:'ハイブリッドパターン：冒頭だけ® 付き・中身はカギカッコのみ・末尾に権利宣言文が必要', decl:true }
 };
 
 const DECL = '※「お絵かきムービー」「お絵かきクリエイター」は株式会社アクアフィールドの登録商標です。';
@@ -320,9 +322,15 @@ document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () =>
   media = b.dataset.m;
   document.getElementById('hint').textContent = MCFG[media].hint;
   const isVideo = media === 'video';
-  document.getElementById('textArea').style.display = isVideo ? 'none' : 'block';
-  document.getElementById('videoArea').style.display = isVideo ? 'flex' : 'none';
-  document.getElementById('inputLabel').textContent = isVideo ? '動画URLを入力' : 'チェックしたいテキストを貼り付け';
+  document.getElementById('textArea').style.display  = isVideo ? 'none'  : 'block';
+  document.getElementById('videoArea').style.display = isVideo ? 'flex'  : 'none';
+  document.getElementById('inputLabel').textContent  = isVideo ? '動画を入力' : (media === 'script' ? '台本テキストを貼り付け' : 'チェックしたいテキストを貼り付け');
+  if (!isVideo) {
+    const placeholder = media === 'script'
+      ? '動画の台本テキストをここに貼り付けてください...\n\n例：\nナレーション：「お絵かきムービー®」で集客を自動化。\nテロップ：お絵かきクリエイターになれる！'
+      : 'ここにテキストを貼り付けてください...';
+    document.getElementById('inputText').placeholder = placeholder;
+  }
 }));
 
 /* ─── Platform toggles ─── */
