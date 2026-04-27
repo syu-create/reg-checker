@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CR Studio — お絵かきクリエイターズ</title>
+<style>
+:root {
+  --bg:      #0C0E1A;
+  --bg2:     #12152A;
+  --surface: #181B2E;
+  --surface2:#1E2138;
+  --border:  rgba(255,255,255,.08);
+  --border2: rgba(255,255,255,.14);
+  --gold:    #C9A84C;
+  --gold-dim: rgba(201,168,76,.15);
+  --gold-glow:rgba(201,168,76,.35);
+  --brand:   #7C5CFC;
+  --brand-g: linear-gradient(135deg,#7C5CFC,#5B8DEF);
+  --ok:      #10B981; --ok-bg:rgba(16,185,129,.12); --ok-b:rgba(16,185,129,.3);
+  --fail:    #EF4444; --fail-bg:rgba(239,68,68,.12); --fail-b:rgba(239,68,68,.3);
+  --warn:    #F59E0B; --warn-bg:rgba(245,158,11,.12);
+  --text:    #EEEEF4; --sub:#7B7F98; --sub2:#5A5E78;
+  --r:14px; --r-sm:9px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+::selection{background:rgba(124,92,252,.4);}
+
+/* ── HEADER ── */
+.hdr{background:linear-gradient(160deg,#08091A 0%,#0F1230 50%,#08091A 100%);border-bottom:1px solid var(--border2);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);}
+.hdr-logo{display:flex;align-items:center;gap:12px;}
+.hdr-gem{width:28px;height:28px;background:linear-gradient(135deg,var(--gold),#E8C96A);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#0C0E1A;flex-shrink:0;}
+.hdr-name{font-size:15px;font-weight:800;letter-spacing:.5px;background:linear-gradient(135deg,#FFF 40%,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hdr-sub{font-size:10px;font-weight:600;color:var(--sub);letter-spacing:1.5px;text-transform:uppercase;}
+.hdr-nav{display:flex;gap:4px;}
+.hdr-nav-btn{padding:7px 16px;border-radius:8px;border:none;background:none;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;transition:all .15s;letter-spacing:.3px;}
+.hdr-nav-btn:hover{color:var(--text);background:var(--surface2);}
+.hdr-nav-btn.active{color:var(--gold);background:var(--gold-dim);}
+.hdr-api{display:flex;align-items:center;gap:10px;}
+.api-dot{width:7px;height:7px;border-radius:50%;background:var(--sub2);}
+.api-dot.on{background:var(--ok);box-shadow:0 0 6px var(--ok);}
+.api-label{font-size:11px;color:var(--sub);}
+.api-change-btn{font-size:11px;color:var(--gold);background:none;border:none;cursor:pointer;text-decoration:underline;}
+
+/* ── MAIN ── */
+.main{max-width:1100px;margin:0 auto;padding:28px 24px 80px;}
+
+/* ── PANEL ── */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:14px;}
+.panel-hd{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.panel-num{width:22px;height:22px;border-radius:6px;background:var(--gold-dim);border:1px solid rgba(201,168,76,.3);color:var(--gold);font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.panel-title{font-size:12px;font-weight:800;color:var(--text);letter-spacing:.8px;text-transform:uppercase;}
+.panel-sub{font-size:11px;color:var(--sub);margin-left:auto;}
+
+/* ── GRID TABS ── */
+.gtabs{display:grid;gap:8px;}
+.gtabs-2{grid-template-columns:1fr 1fr;}
+.gtabs-3{grid-template-columns:1fr 1fr 1fr;}
+.gtabs-4{grid-template-columns:repeat(4,1fr);}
+.gtabs-5{grid-template-columns:repeat(5,1fr);}
+@media(max-width:600px){.gtabs-4,.gtabs-5{grid-template-columns:repeat(2,1fr);}}
+.gtab{padding:12px 10px;border-radius:10px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;transition:all .18s;text-align:center;position:relative;overflow:hidden;}
+.gtab:hover{border-color:rgba(124,92,252,.4);background:rgba(124,92,252,.08);}
+.gtab.on{border-color:var(--brand);background:rgba(124,92,252,.12);}
+.gtab.on::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--brand-g);}
+.gtab-icon{font-size:18px;margin-bottom:6px;display:block;}
+.gtab-label{font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.3px;}
+.gtab.on .gtab-label{color:var(--text);}
+.gtab-desc{font-size:10px;color:var(--sub2);margin-top:3px;line-height:1.4;}
+
+/* LP CARDS */
+.lp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:600px){.lp-grid{grid-template-columns:1fr;}}
+.lp-card{padding:14px 16px;border-radius:11px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;transition:all .18s;position:relative;overflow:hidden;}
+.lp-card:hover{border-color:rgba(201,168,76,.35);}
+.lp-card.on{border-color:var(--gold);background:var(--gold-dim);}
+.lp-card.on::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--gold);}
+.lp-tag{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:1px;padding:2px 7px;border-radius:5px;margin-bottom:8px;display:inline-block;}
+.lpt-shindan{background:rgba(168,85,247,.2);color:#C084FC;}
+.lpt-dd{background:rgba(16,185,129,.15);color:#34D399;}
+.lpt-survey{background:rgba(245,158,11,.15);color:#FBB84C;}
+.lp-name{font-size:13px;font-weight:800;color:var(--text);margin-bottom:4px;}
+.lp-goal{font-size:11px;color:var(--sub);line-height:1.5;}
+.lp-cta{margin-top:8px;font-size:10px;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:4px;}
+
+/* CUSTOM LP */
+.custom-lp-toggle{font-size:11px;color:var(--brand);background:none;border:none;cursor:pointer;margin-top:10px;display:flex;align-items:center;gap:5px;}
+.custom-lp-area{display:none;margin-top:12px;}
+.custom-lp-area.open{display:block;}
+.field-label{font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;}
+.dark-input{width:100%;border:1px solid var(--border2);border-radius:8px;padding:10px 13px;font-size:13px;font-family:inherit;background:var(--bg2);color:var(--text);outline:none;transition:border .15s;}
+.dark-input:focus{border-color:var(--brand);}
+.dark-input::placeholder{color:var(--sub2);}
+.dark-textarea{width:100%;min-height:80px;border:1px solid var(--border2);border-radius:8px;padding:10px 13px;font-size:13px;font-family:inherit;background:var(--bg2);color:var(--text);outline:none;resize:vertical;line-height:1.7;transition:border .15s;}
+.dark-textarea:focus{border-color:var(--brand);}
+.dark-textarea::placeholder{color:var(--sub2);}
+
+/* ANGLE GRID */
+.angle-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;}
+.angle-card{padding:12px 14px;border-radius:10px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;transition:all .15s;position:relative;}
+.angle-card:hover{border-color:rgba(124,92,252,.4);}
+.angle-card.on{border-color:var(--brand);background:rgba(124,92,252,.1);}
+.angle-check{position:absolute;top:10px;right:10px;width:15px;height:15px;border-radius:50%;border:1.5px solid var(--border2);font-size:8px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.angle-card.on .angle-check{background:var(--brand);border-color:var(--brand);color:#fff;}
+.angle-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;padding-right:20px;}
+.angle-keyword{font-size:10px;color:var(--gold);font-weight:600;margin-bottom:4px;}
+.angle-sub{font-size:10px;color:var(--sub);line-height:1.5;}
+
+/* PERSONA TAG */
+.persona-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.persona-tag{font-size:11px;font-weight:600;color:var(--sub);background:var(--surface2);border:1px solid var(--border);padding:4px 12px;border-radius:20px;cursor:pointer;transition:all .15s;}
+.persona-tag:hover{border-color:var(--brand);color:var(--brand);}
+.persona-tag.on{background:rgba(124,92,252,.15);border-color:var(--brand);color:var(--text);}
+
+/* GENERATE BTN */
+.gen-btn{width:100%;padding:17px;background:linear-gradient(135deg,#6C47FF 0%,#5B8DEF 100%);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;letter-spacing:.5px;transition:all .15s;box-shadow:0 4px 24px rgba(108,71,255,.3);display:flex;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden;}
+.gen-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.1),transparent);pointer-events:none;}
+.gen-btn:hover{box-shadow:0 6px 32px rgba(108,71,255,.45);transform:translateY(-1px);}
+.gen-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.spinner{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;flex-shrink:0;}
+.gen-btn.loading .spinner{display:block;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* RESULT AREA */
+.result-wrap{display:none;}
+.result-label{font-size:10px;font-weight:800;color:var(--sub);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.result-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.output-box{background:var(--bg2);border:1px solid var(--border2);border-radius:11px;padding:22px;font-size:14px;line-height:2.1;white-space:pre-wrap;word-break:break-word;color:var(--text);min-height:140px;position:relative;}
+.output-box.streaming::after{content:'▌';animation:blink .6s step-end infinite;color:var(--gold);}
+@keyframes blink{50%{opacity:0}}
+.output-actions{display:flex;gap:8px;margin-top:12px;justify-content:flex-end;}
+.btn-ghost{padding:8px 18px;background:none;color:var(--brand);border:1px solid rgba(124,92,252,.4);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;}
+.btn-ghost:hover{background:rgba(124,92,252,.1);}
+.btn-solid{padding:8px 18px;background:var(--brand-g);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;}
+.btn-solid:hover{opacity:.9;}
+.btn-gold{padding:8px 18px;background:var(--gold-dim);color:var(--gold);border:1px solid rgba(201,168,76,.3);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;}
+.btn-gold:hover{background:rgba(201,168,76,.25);}
+
+/* REG CHECK */
+.reg-result{margin-top:14px;}
+.reg-header{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:9px;font-size:13px;font-weight:700;}
+.reg-pass{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-b);}
+.reg-fail{background:var(--fail-bg);color:var(--fail);border:1px solid var(--fail-b);}
+.reg-warn{background:var(--warn-bg);color:var(--warn);border:1px solid rgba(245,158,11,.3);}
+.reg-vlist{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.reg-vitem{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:9px;padding:12px 14px;}
+.reg-rule{font-size:10px;font-weight:800;color:#F87171;letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px;}
+.reg-rows{display:flex;flex-direction:column;gap:5px;}
+.reg-row{display:flex;gap:10px;align-items:flex-start;}
+.reg-lbl{font-size:10px;font-weight:700;color:var(--sub);min-width:52px;padding-top:2px;flex-shrink:0;}
+.reg-val{font-size:12px;color:var(--text);line-height:1.6;}
+.chip-bad{background:rgba(239,68,68,.2);color:#FCA5A5;padding:2px 8px;border-radius:5px;font-family:monospace;font-size:12px;}
+.chip-good{background:rgba(16,185,129,.15);color:#6EE7B7;padding:2px 8px;border-radius:5px;font-family:monospace;font-size:12px;}
+.fixed-box{background:rgba(16,185,129,.07);border:1px solid var(--ok-b);border-radius:10px;padding:18px;font-size:13px;line-height:2;white-space:pre-wrap;word-break:break-word;color:var(--text);margin-top:12px;}
+
+/* HISTORY TAB */
+.hist-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.hf{padding:5px 13px;border-radius:20px;border:1px solid var(--border2);background:var(--surface2);font-size:11px;font-weight:700;color:var(--sub);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;}
+.hf:hover{border-color:var(--brand);color:var(--brand);}
+.hf.on{background:rgba(124,92,252,.15);border-color:var(--brand);color:var(--text);}
+.hf-cnt{font-size:9px;opacity:.6;}
+.hist-list{display:flex;flex-direction:column;gap:8px;}
+.hist-item{padding:14px 16px;border-radius:11px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:12px;}
+.hist-item:hover{border-color:rgba(201,168,76,.35);background:var(--gold-dim);}
+.hist-item.pass{border-left:3px solid var(--ok);}
+.hist-item.fail{border-left:3px solid var(--fail);}
+.hi-left{flex:1;min-width:0;}
+.hi-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:7px;}
+.hi-badge{font-size:9px;font-weight:800;padding:2px 8px;border-radius:6px;letter-spacing:.3px;}
+.hib-script{background:rgba(16,185,129,.15);color:#34D399;}
+.hib-copy{background:rgba(124,92,252,.15);color:#A78BFA;}
+.hib-banner{background:rgba(245,158,11,.15);color:#FBB84C;}
+.hib-video{background:rgba(239,68,68,.15);color:#FCA5A5;}
+.hib-sns{background:rgba(59,130,246,.15);color:#93C5FD;}
+.hi-preview{font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px;}
+.hi-meta{font-size:10px;color:var(--sub2);margin-top:5px;}
+.hi-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
+.hi-status{font-size:10px;font-weight:800;padding:3px 10px;border-radius:10px;}
+.hi-ok{background:var(--ok-bg);color:var(--ok);}
+.hi-ng{background:var(--fail-bg);color:var(--fail);}
+.hi-toggle{font-size:11px;color:var(--brand);background:rgba(124,92,252,.1);border:none;border-radius:7px;padding:4px 10px;cursor:pointer;font-weight:700;}
+.hi-detail{display:none;padding:14px 16px 0;border-top:1px solid var(--border);}
+.hi-detail.open{display:block;}
+
+/* API MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;display:none;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:32px;width:100%;max-width:480px;box-shadow:0 24px 80px rgba(0,0,0,.5);}
+.modal h2{font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.modal p{font-size:12px;color:var(--sub);margin-bottom:20px;line-height:1.6;}
+.modal-actions{display:flex;gap:10px;margin-top:16px;}
+.empty{text-align:center;padding:40px 24px;color:var(--sub);font-size:13px;line-height:1.8;}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+.divider{height:1px;background:var(--border);margin:20px 0;}
+
+/* TABS PAGE */
+.tab-page{display:none;}
+.tab-page.active{display:block;}
+
+/* SECTION HINT */
+.section-hint{font-size:11px;color:var(--sub);background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:9px 13px;margin-bottom:16px;line-height:1.6;border-left:2px solid var(--gold);}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<!-- API MODAL -->
+<div class="modal-bg" id="apiModal">
+  <div class="modal">
+    <h2>Claude APIキーを設定</h2>
+    <p>Anthropic ConsoleでAPIキーを発行してください。キーは端末のlocalStorageのみに保存されます。外部サーバーへの送信はありません。</p>
+    <div style="margin-bottom:10px;">
+      <div class="field-label">APIキー</div>
+      <input class="dark-input" id="apiKeyInput" type="password" placeholder="sk-ant-api03-..." autocomplete="off">
+    </div>
+    <div id="apiError" style="font-size:12px;color:var(--fail);display:none;margin-bottom:8px;"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeApiModal()" style="flex:1;">後で設定</button>
+      <button class="btn-solid" onclick="saveApiKey()" style="flex:2;">保存して開始</button>
+    </div>
+    <div style="margin-top:12px;font-size:10px;color:var(--sub2);text-align:center;">APIキーは <a href="https://console.anthropic.com" target="_blank" style="color:var(--gold);">console.anthropic.com</a> で発行できます</div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-logo">
+    <div class="hdr-gem">✦</div>
+    <div>
+      <div class="hdr-name">CR Studio</div>
+      <div class="hdr-sub">お絵かきクリエイターズ</div>
+    </div>
+  </div>
+  <div class="hdr-nav">
+    <button class="hdr-nav-btn active" onclick="switchPage('generate')">✦ CR生成</button>
+    <button class="hdr-nav-btn" onclick="switchPage('history')">履歴</button>
+    <a href="reg-checker.html" style="text-decoration:none;"><button class="hdr-nav-btn">レギュチェッカー</button></a>
+  </div>
+  <div class="hdr-api">
+    <div class="api-dot" id="apiDot"></div>
+    <span class="api-label" id="apiLabel">APIキー未設定</span>
+    <button class="api-change-btn" onclick="openApiModal()">設定</button>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ══════════ CR生成ページ ══════════ -->
+<div class="tab-page active" id="page-generate">
+
+  <!-- STEP 1: 案件LP -->
+  <div class="panel">
+    <div class="panel-hd">
+      <div class="panel-num">1</div>
+      <div class="panel-title">案件・LP を選択</div>
+      <div class="panel-sub">導線に合わせた訴求を自動設定</div>
+    </div>
+    <div class="lp-grid" id="lpGrid">
+
+      <div class="lp-card on" data-lp="shindan" onclick="selectLP(this)">
+        <div class="lp-tag lpt-shindan">診断LP</div>
+        <div class="lp-name">イラスト収入化 診断</div>
+        <div class="lp-goal">スキルはあるが収入化できていない層へ。診断形式で「いくらで買い取れるか」を訴求し5日間WSへ誘導</div>
+        <div class="lp-cta">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          5日間ワークショップ → メール登録
+        </div>
+      </div>
+
+      <div class="lp-card" data-lp="dd" onclick="selectLP(this)">
+        <div class="lp-tag lpt-dd">DD（Drawing Days）</div>
+        <div class="lp-name">5日間無料 LIVE レッスン</div>
+        <div class="lp-goal">「ラクガキレベルからスタート」。絵を楽しく学びたい社会人・学生向け。楽しさ・技術習得を前面に</div>
+        <div class="lp-cta">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          アンケート回答 → LINE参加
+        </div>
+      </div>
+
+      <div class="lp-card" data-lp="survey19" onclick="selectLP(this)">
+        <div class="lp-tag lpt-survey">アンケートLP19</div>
+        <div class="lp-name">起業WS 5日間（診断チェックリスト型）</div>
+        <div class="lp-goal">「絵を仕事にしたい」「副業したい」層へ。自己診断チェックリストで共感→メール登録へ誘導</div>
+        <div class="lp-cta">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          自己診断 → メール登録
+        </div>
+      </div>
+
+      <div class="lp-card" data-lp="survey84" onclick="selectLP(this)">
+        <div class="lp-tag lpt-survey">アンケートLP84</div>
+        <div class="lp-name">起業WS 5日間（5問診断型）</div>
+        <div class="lp-goal">在宅・副業希望者へ。5問診断で「はいが1つでも」方式。参入障壁を下げた設計</div>
+        <div class="lp-cta">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          5問診断 → メール登録
+        </div>
+      </div>
+
+    </div>
+
+    <button class="custom-lp-toggle" onclick="toggleCustomLP()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      カスタム案件・LPを入力する
+    </button>
+    <div class="custom-lp-area" id="customLPArea">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+        <div>
+          <div class="field-label">案件名</div>
+          <input class="dark-input" id="customName" placeholder="例：夏限定キャンペーン">
+        </div>
+        <div>
+          <div class="field-label">LP URL</div>
+          <input class="dark-input" id="customUrl" placeholder="https://...">
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <div class="field-label">LP の目的・導線</div>
+        <input class="dark-input" id="customGoal" placeholder="例：無料セミナー申込 → LINE登録">
+      </div>
+      <div style="margin-top:10px;">
+        <div class="field-label">ターゲット・訴求ポイント</div>
+        <textarea class="dark-textarea" id="customTarget" placeholder="例：30代の主婦で絵を趣味にしているが収入化できていない層。「好きを仕事に」訴求。"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: 媒体 + CRタイプ -->
+  <div class="panel">
+    <div class="panel-hd">
+      <div class="panel-num">2</div>
+      <div class="panel-title">媒体 &amp; CRタイプ</div>
+    </div>
+    <div style="margin-bottom:16px;">
+      <div class="field-label" style="margin-bottom:10px;">配信媒体</div>
+      <div class="gtabs gtabs-3" id="pfTabs">
+        <div class="gtab on" data-pf="meta" onclick="selectGTab(this,'pfTabs')">
+          <span class="gtab-icon">📘</span>
+          <div class="gtab-label">Meta / Instagram</div>
+          <div class="gtab-desc">Facebook・IG 広告</div>
+        </div>
+        <div class="gtab" data-pf="x" onclick="selectGTab(this,'pfTabs')">
+          <span class="gtab-icon">𝕏</span>
+          <div class="gtab-label">X（Twitter）</div>
+          <div class="gtab-desc">ポスト・プロモ広告</div>
+        </div>
+        <div class="gtab" data-pf="youtube" onclick="selectGTab(this,'pfTabs')">
+          <span class="gtab-icon">▶</span>
+          <div class="gtab-label">YouTube</div>
+          <div class="gtab-desc">動画・概要欄</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="field-label" style="margin-bottom:10px;">CRタイプ</div>
+      <div class="gtabs gtabs-5" id="typeTabs">
+        <div class="gtab on" data-type="script" onclick="selectGTab(this,'typeTabs')">
+          <span class="gtab-icon">📝</span>
+          <div class="gtab-label">台本</div>
+          <div class="gtab-desc">60〜90秒ナレーション</div>
+        </div>
+        <div class="gtab" data-type="copy" onclick="selectGTab(this,'typeTabs')">
+          <span class="gtab-icon">✍️</span>
+          <div class="gtab-label">コピー</div>
+          <div class="gtab-desc">HL+ボディ+CTA</div>
+        </div>
+        <div class="gtab" data-type="banner" onclick="selectGTab(this,'typeTabs')">
+          <span class="gtab-icon">🖼️</span>
+          <div class="gtab-label">バナー文案</div>
+          <div class="gtab-desc">3パターン A/B/C</div>
+        </div>
+        <div class="gtab" data-type="sns" onclick="selectGTab(this,'typeTabs')">
+          <span class="gtab-icon">📲</span>
+          <div class="gtab-label">SNS投稿文</div>
+          <div class="gtab-desc">媒体別テキスト</div>
+        </div>
+        <div class="gtab" data-type="video" onclick="selectGTab(this,'typeTabs')">
+          <span class="gtab-icon">🎬</span>
+          <div class="gtab-label">動画企画</div>
+          <div class="gtab-desc">構成案+台本要点</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: 訴求軸 + ターゲット -->
+  <div class="panel">
+    <div class="panel-hd">
+      <div class="panel-num">3</div>
+      <div class="panel-title">訴求軸 &amp; ターゲット</div>
+      <div class="panel-sub">344名のアンケートデータから設計</div>
+    </div>
+
+    <div class="section-hint">
+      アンケート結果より：女性91.6% / 30〜40代が中心 / 68.9%が未経験スタート / 主な悩み「収入・在宅・絵で稼げない」/ 検索KW「在宅ワーク」「副業」「イラスト 在宅」
+    </div>
+
+    <div class="field-label" style="margin-bottom:10px;">訴求軸（複数選択可）</div>
+    <div class="angle-grid" id="angleGrid">
+      <div class="angle-card on" data-a="income" onclick="toggleAngle(this)">
+        <div class="angle-check">✓</div>
+        <div class="angle-keyword">収入・在宅</div>
+        <div class="angle-title">在宅で収入を得る</div>
+        <div class="angle-sub">収入が少ない、副業したい層。個人差注釈を必ず付ける</div>
+      </div>
+      <div class="angle-card" data-a="hobby" onclick="toggleAngle(this)">
+        <div class="angle-check"></div>
+        <div class="angle-keyword">好きを仕事に</div>
+        <div class="angle-title">絵好きを仕事にしたい</div>
+        <div class="angle-sub">技術はあるのに活かせていない。趣味から仕事へ</div>
+      </div>
+      <div class="angle-card" data-a="housewife" onclick="toggleAngle(this)">
+        <div class="angle-check"></div>
+        <div class="angle-keyword">主婦・育児</div>
+        <div class="angle-title">育児しながら自分の仕事</div>
+        <div class="angle-sub">子育て中の30〜40代女性。自分の時間で働きたい</div>
+      </div>
+      <div class="angle-card" data-a="beginner" onclick="toggleAngle(this)">
+        <div class="angle-check"></div>
+        <div class="angle-keyword">未経験スタート</div>
+        <div class="angle-title">絵の経験ゼロでも大丈夫</div>
+        <div class="angle-sub">95%が未経験スタートという実績で安心感を訴求</div>
+      </div>
+      <div class="angle-card" data-a="freedom" onclick="toggleAngle(this)">
+        <div class="angle-check"></div>
+        <div class="angle-keyword">自由・時間</div>
+        <div class="angle-title">場所・時間を選ばない働き方</div>
+        <div class="angle-sub">電車通勤・時間拘束からの解放。転勤族にも対応</div>
+      </div>
+      <div class="angle-card" data-a="career" onclick="toggleAngle(this)">
+        <div class="angle-check"></div>
+        <div class="angle-keyword">副業・転職</div>
+        <div class="angle-title">新しいキャリアへの一歩</div>
+        <div class="angle-sub">会社員43%が入学前職。副業・転職先として</div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;">
+      <div class="field-label" style="margin-bottom:8px;">ターゲットペルソナ（クリックで追加）</div>
+      <div class="persona-row" id="personaRow">
+        <div class="persona-tag" onclick="togglePersona(this)">30代主婦・子育て中</div>
+        <div class="persona-tag" onclick="togglePersona(this)">40代会社員・副業希望</div>
+        <div class="persona-tag" onclick="togglePersona(this)">転勤族の妻</div>
+        <div class="persona-tag" onclick="togglePersona(this)">絵が好きだった元学生</div>
+        <div class="persona-tag" onclick="togglePersona(this)">フリーランス単価に悩む人</div>
+        <div class="persona-tag" onclick="togglePersona(this)">いつか絵を仕事にしたい人</div>
+        <div class="persona-tag" onclick="togglePersona(this)">育休・産休中の女性</div>
+        <div class="persona-tag" onclick="togglePersona(this)">介護・看護職の副業希望</div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;">
+      <div class="field-label" style="margin-bottom:6px;">追加指示・こだわり（任意）</div>
+      <textarea class="dark-textarea" id="notesInput" placeholder="例：前半15秒で転勤族の共感を掴み、後半でアカデミーの実績を伝える構成に。柔らかいトーンで。"></textarea>
+    </div>
+  </div>
+
+  <!-- GENERATE BTN -->
+  <button class="gen-btn" id="genBtn" onclick="generate()">
+    <div class="spinner" id="spinner"></div>
+    <span id="genBtnTxt">✦ クリエイティブを生成する</span>
+  </button>
+
+  <!-- RESULT -->
+  <div class="panel result-wrap" id="resultWrap" style="margin-top:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold-glow);"></div>
+        <span style="font-size:13px;font-weight:800;color:var(--text);">生成結果</span>
+        <span id="resultBadge" style="font-size:10px;font-weight:800;padding:2px 9px;border-radius:6px;"></span>
+      </div>
+      <span style="font-size:11px;color:var(--sub);" id="resultTs"></span>
+    </div>
+
+    <div class="result-label">生成されたクリエイティブ</div>
+    <div class="output-box" id="outputBox"></div>
+    <div class="output-actions">
+      <button class="btn-ghost" onclick="generate()">再生成</button>
+      <button class="btn-gold" onclick="sendToChecker()">レギュチェッカーへ送る</button>
+      <button class="btn-solid" onclick="copyOutput()">コピー</button>
+    </div>
+    <div class="reg-result" id="regResult"></div>
+  </div>
+</div>
+
+<!-- ══════════ 履歴ページ ══════════ -->
+<div class="tab-page" id="page-history">
+  <div class="panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="font-size:13px;font-weight:800;color:var(--text);">生成履歴</div>
+      <button onclick="clearHist()" style="font-size:11px;color:var(--sub);background:none;border:1px solid var(--border2);border-radius:6px;padding:4px 10px;cursor:pointer;">すべて削除</button>
+    </div>
+    <div class="hist-filter" id="histFilter"></div>
+    <div id="histList"></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+/* ═══════════════════════════════
+   STATE
+═══════════════════════════════ */
+let selectedLP   = 'shindan';
+let selectedPF   = 'meta';
+let selectedType = 'script';
+let currentText  = '';
+let histFilter   = 'all';
+
+const LP_DATA = {
+  shindan:  { name:'診断LP', tag:'診断LP', goal:'5日間ワークショップ（無料） → メール登録', cta:'「あなたのイラスト、いくらで買い取れるか診断」を受けてみてください！', target:'スキルはあるがSNS投稿が「いいね」で終わり収入化できていない人。価格設定が不明確な人', url:'https://creatorsacademy.jp/challenge_landing_lp82_shindan_dali/' },
+  dd:       { name:'DD（Drawing Days）', tag:'DD', goal:'5日間無料LIVEレッスン → LINEオープンチャット参加', cta:'5日間無料LIVEレッスンに参加する', target:'ラクガキレベルの初心者。時間がない社会人。練習方法がわからない人。楽しく絵を学びたい人', url:'https://creatorsacademy.jp/wd_landing_lp14_dali/' },
+  survey19: { name:'アンケートLP19', tag:'アンケートLP19', goal:'5日間集中ワークショップ（無料） → メール登録', cta:'今すぐ無料ワークショップに参加する', target:'絵を仕事にしたい人・副業で自宅から絵の仕事をしたい人', url:'https://creatorsacademy.jp/clp/challenge_landing_lp99_an_dali/' },
+  survey84: { name:'アンケートLP84', tag:'アンケートLP84', goal:'5日間集中ワークショップ（無料）→ メール登録（5問診断型）', cta:'メールアドレスを入力して今すぐ参加する', target:'在宅で副業したい人。自己診断で「はいが1つでも」あてはまる人', url:'https://creatorsacademy.jp/clp/challenge_landing2_lp01_an_dali/' },
+  custom:   { name:'カスタム案件', tag:'カスタム', goal:'', cta:'', target:'', url:'' }
+};
+
+const TYPE_LABELS = { script:'📝 台本', copy:'✍️ コピー', banner:'🖼️ バナー文案', sns:'📲 SNS投稿文', video:'🎬 動画企画' };
+const TYPE_BADGE_STYLE = {
+  script: 'background:rgba(16,185,129,.15);color:#34D399;',
+  copy:   'background:rgba(124,92,252,.15);color:#A78BFA;',
+  banner: 'background:rgba(245,158,11,.15);color:#FBB84C;',
+  sns:    'background:rgba(59,130,246,.15);color:#93C5FD;',
+  video:  'background:rgba(239,68,68,.15);color:#FCA5A5;'
+};
+const PF_LABELS = { meta:'Meta / Instagram', x:'X（Twitter）', youtube:'YouTube' };
+
+/* ═══════════════════════════════
+   INIT
+═══════════════════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  const key = localStorage.getItem('crStudioApiKey');
+  if (!key) {
+    document.getElementById('apiModal').classList.add('open');
+  } else {
+    updateApiStatus(true);
+  }
+  renderHist();
+});
+
+/* ═══════════════════════════════
+   API KEY
+═══════════════════════════════ */
+function openApiModal(){ document.getElementById('apiModal').classList.add('open'); }
+function closeApiModal(){ document.getElementById('apiModal').classList.remove('open'); }
+
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  const err = document.getElementById('apiError');
+  if (!key.startsWith('sk-ant-')) {
+    err.style.display = 'block'; err.textContent = '⚠ sk-ant-api... で始まるキーを入力してください'; return;
+  }
+  localStorage.setItem('crStudioApiKey', key);
+  updateApiStatus(true);
+  closeApiModal();
+}
+
+function updateApiStatus(on) {
+  document.getElementById('apiDot').classList.toggle('on', on);
+  document.getElementById('apiLabel').textContent = on ? 'APIキー設定済み' : 'APIキー未設定';
+}
+
+/* ═══════════════════════════════
+   PAGE NAVIGATION
+═══════════════════════════════ */
+function switchPage(page) {
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+  document.getElementById(`page-${page}`).classList.add('active');
+  document.querySelectorAll('.hdr-nav-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  if (page === 'history') renderHist();
+}
+
+/* ═══════════════════════════════
+   SELECTORS
+═══════════════════════════════ */
+function selectLP(card) {
+  document.querySelectorAll('.lp-card').forEach(c => c.classList.remove('on'));
+  card.classList.add('on');
+  selectedLP = card.dataset.lp;
+  if (selectedLP === 'custom') document.getElementById('customLPArea').classList.add('open');
+}
+
+function selectGTab(el, groupId) {
+  document.querySelectorAll(`#${groupId} .gtab`).forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  if (groupId === 'pfTabs')   selectedPF   = el.dataset.pf;
+  if (groupId === 'typeTabs') selectedType = el.dataset.type;
+}
+
+function toggleCustomLP() {
+  const area = document.getElementById('customLPArea');
+  area.classList.toggle('open');
+}
+
+function toggleAngle(card) {
+  card.classList.toggle('on');
+  card.querySelector('.angle-check').textContent = card.classList.contains('on') ? '✓' : '';
+}
+
+function togglePersona(tag) { tag.classList.toggle('on'); }
+
+function getAngles() {
+  return [...document.querySelectorAll('#angleGrid .angle-card.on')].map(c => {
+    const map = { income:'収入・在宅での仕事（個人差注釈必須）', hobby:'好きを仕事に（絵好きを活かす）', housewife:'主婦・育児との両立', beginner:'未経験・ゼロスタートでも可', freedom:'場所・時間を選ばない自由な働き方', career:'副業・転職・新キャリア' };
+    return map[c.dataset.a] || c.dataset.a;
+  });
+}
+
+function getPersonas() {
+  return [...document.querySelectorAll('#personaRow .persona-tag.on')].map(t => t.textContent);
+}
+
+/* ═══════════════════════════════
+   SYSTEM PROMPT
+═══════════════════════════════ */
+function buildSystemPrompt() {
+  return `あなたは「お絵かきクリエイターズアカデミー」専属クリエイティブディレクターです。
+以下の情報をすべて把握し、レギュレーションを100%守りながら成果の出るCRを生成してください。
+
+━━ サービス情報 ━━
+・運営: 株式会社アクアフィールド
+・サービス名: お絵かきクリエイターズアカデミー
+・コンセプト: 「好きを仕事にして、豊かに自由に生きる」
+・内容: 「お絵かきムービー®」（ストーリーを手描きアニメで伝える映像）の制作・販売技術を学ぶ起業スクール
+・実績: 累計3,000名以上・卒業生総売上7億円超・参加者の95%が絵の経験ゼロからスタート
+・卒業生実績: 月収35万〜100万円超（※個人差があります）、最高2,040万円
+・入学プロセス: 体験会(dots) → 電話診断 → 面談合格 → 入学
+
+━━ アンケートデータ（344名の実際の会員データ） ━━
+・性別: 女性91.6%、男性8.4%
+・年齢: 30代34%、40代27.3%、20代23.5%
+・クリエイター専門経験: なし68.9%（圧倒的多数が未経験）
+・入学前職業: 会社員43%、パート・アルバイト10.5%、専業主婦8.1%
+・入学前年収: 多数が200万円以下。300万未満が過半数
+・入学前の悩み: 収入・お金、自由な働き方、絵で稼げない、単価が安い
+・検索KW: 在宅ワーク、副業、イラスト 在宅、在宅 副業、在宅 仕事
+・入学の決め手: 面談・成果事例を聞いた・サポートが充実・実際に主婦で成果を出している人がいること
+・誰に勧めるか: 絵が好きな人、技術はあるが薄給の人、絵を描けるのに活かしていない人
+・勧め方: 「マイムービーを見せる」「好きなことを仕事にできる」「サポートが充実している」
+
+━━ 4つのLP導線詳細 ━━
+【診断LP】 目標: 5日間WS申込 → メール登録
+  訴求: 「あなたのイラスト、いくらで買い取れるか診断」で収入化に悩む層を引き込む
+  ターゲット: SNSが「いいね」で終わり収入化できていない層。価格設定不明確な人
+  CTA誘導: 診断→スコア算出（1万〜100万）→ ワークショップ申込
+
+【DD（Drawing Days）】 目標: LINEオープンチャット参加
+  訴求: 「ラクガキレベルからスタート」楽しさ重視。5日間無料LIVEレッスン
+  ターゲット: 絵を楽しく学びたい社会人・学生。練習方法がわからない人
+  CTA誘導: アンケート → メール登録 → プレゼント受取 → LINE参加
+
+【アンケートLP19】 目標: ワークショップ申込（メール登録）
+  訴求: 絵を仕事・副業にしたい層への直接訴求。自己診断チェックリスト形式
+  ターゲット: 副業・在宅ワーク希望。絵を仕事にしたことがある or したい人
+  CTA誘導: 自己診断 → はい1つでも → メール登録
+
+【アンケートLP84】 目標: ワークショップ申込（メール登録）
+  訴求: 在宅副業訴求 + 5問診断型。参入障壁を最大限下げた設計
+  ターゲット: 自宅で副業したい人。とにかく気軽に始めたい人
+  CTA誘導: 5問診断 → メール登録 → WS参加（2026-05-05）
+
+━━ 媒体別ルール ━━
+【Meta / Instagram】
+  ・個人属性への直接言及を避ける（「収入が少ない方」などはNG）
+  ・感情共感型 → ストーリー型の構成が効果的
+  ・リール: 冒頭3秒でスクロールを止める問いかけ
+  ・画像: ヴィジュアルで世界観を伝え、テキストは補足
+
+【X（Twitter）】
+  ・280文字以内の投稿文を意識
+  ・最初のツイート文がすべて。インパクト重視
+  ・数字・問いかけ・体験談が効果的
+  ・ハッシュタグは2〜3個
+
+【YouTube】
+  ・タイトル: SEO + クリック率両立
+  ・概要欄: キーワード含有 + LP誘導リンク
+  ・台本: 視聴維持率を意識した構成（冒頭で答えを出す）
+
+━━ 【商標表記 絶対ルール】 ━━
+【バナー・コピー・SNS投稿 → フル表記パターン】
+  すべての箇所: 「お絵かきムービー®」「お絵かきクリエイター®」（カギカッコ+®必須）
+
+【台本・動画企画 → ハイブリッドパターン】
+  初出のみ: 「お絵かきムービー®」「お絵かきクリエイター®」
+  2回目以降: 「お絵かきムービー」「お絵かきクリエイター」（カギカッコのみ）
+  末尾必須: ※「お絵かきムービー」「お絵かきクリエイター」は株式会社アクアフィールドの登録商標です。
+
+━━ 【絶対NG表現】 ━━
+1. お絵描き（漢字）→ 「お絵かき」（ひらがな）
+2. オエカキムービー（カタカナ）
+3. お絵ムー（略称）
+4. 認定お絵かきクリエイター（「認定」はNG）
+5. お絵描きビデオ
+6. お給料・給料（就職誤解）
+7. 絵師（「お絵かきクリエイター®」と表記）
+8. 絵を描くだけで〜（誇大簡略化）
+9. イラストスクール（「お絵かきクリエイターズアカデミー」が正式）
+10. ワークレッスン
+11. 公的機関から受賞・国から受賞
+12. 応募が殺到（根拠なし）
+13. リモート完結
+14. ネットで探せばゴロゴロ
+
+━━ 収入表現ルール ━━
+・具体的な収入数字・「稼げる」断言には必ず「※個人差があります」
+・「必ず」「絶対に」「確実に」などの保証表現はNG
+・「目指せる」「可能性がある」「実現した方もいます」等に留める
+
+━━ 出力形式 ━━
+生成するCRテキストのみを出力してください。説明文・前置き・「以下が〜」などは不要です。`;
+}
+
+function buildUserPrompt() {
+  const lp = selectedLP === 'custom'
+    ? { name: document.getElementById('customName').value||'カスタム案件', goal: document.getElementById('customGoal').value, target: document.getElementById('customTarget').value, cta:'（カスタムCTA）', url: document.getElementById('customUrl').value }
+    : LP_DATA[selectedLP];
+
+  const angles  = getAngles();
+  const personas = getPersonas();
+  const notes   = document.getElementById('notesInput').value.trim();
+  const pfLabel = PF_LABELS[selectedPF]||selectedPF;
+
+  const typeInstr = {
+    script:`【台本】60〜90秒の動画ナレーション台本を作成。
+構成: 冒頭(0-15秒)共感→中盤(15-65秒)サービス紹介・実績・ベネフィット→ラスト(65-90秒)CTA
+商標: ハイブリッドパターン（初出®付き、以降カギカッコのみ）
+末尾に権利宣言文を必ず記載。`,
+
+    copy:`【広告コピー】以下の形式で作成:
+■ ヘッドライン（20文字以内・インパクト重視）
+■ サブコピー（40〜60文字・ベネフィット）
+■ ボディコピー（100〜150文字・詳細+実績）
+■ CTA（15文字以内）
+商標: フルパターン（全箇所®付き）`,
+
+    banner:`【バナー文案】3パターン(A/B/C)を作成。各パターン:
+・キャッチコピー（15文字以内）
+・サブコピー（25文字以内）
+・CTAボタン文言（10文字以内）
+A=共感型 B=実績型 C=好奇心型 で訴求軸を変える
+商標: フルパターン（全箇所®付き）`,
+
+    sns:`【SNS投稿文】${pfLabel}向けの広告投稿テキスト。
+${selectedPF==='x'?'・280文字以内\n・インパクトある一行目\n・ハッシュタグ2〜3個':selectedPF==='youtube'?'・動画タイトル案3本\n・概要欄テキスト（300文字）\n・概要欄LP誘導文':'・Meta広告テキスト（メインテキスト200文字以内）\n・見出し（30文字以内）\n・説明文（20文字以内）'}
+商標: フルパターン（全箇所®付き）`,
+
+    video:`【動画企画書】以下の形式で作成:
+■ タイトル案（3パターン）
+■ サムネイル文言（2案）
+■ 動画の流れ（冒頭30秒・中盤・ラスト30秒の要点）
+■ 核心メッセージ
+■ CTA（LP誘導）
+商標: ハイブリッドパターン（初出®付き）+ 末尾権利宣言文`
+  };
+
+  return `${typeInstr[selectedType]}
+
+配信媒体: ${pfLabel}
+案件LP: ${lp.name}（${lp.url}）
+LP導線の目標: ${lp.goal}
+LPのCTA文言: ${lp.cta}
+LPターゲット: ${lp.target}
+訴求軸: ${angles.length ? angles.join('、') : '全般'}
+${personas.length ? `ターゲットペルソナ: ${personas.join('、')}` : ''}
+${notes ? `追加指示: ${notes}` : ''}
+
+レギュレーションを完全に守りながら、ターゲットの心に刺さる魅力的なCRを生成してください。`;
+}
+
+/* ═══════════════════════════════
+   GENERATE
+═══════════════════════════════ */
+async function generate() {
+  const apiKey = localStorage.getItem('crStudioApiKey');
+  if (!apiKey) { openApiModal(); return; }
+
+  const btn     = document.getElementById('genBtn');
+  const spinner = document.getElementById('spinner');
+  const output  = document.getElementById('outputBox');
+  const wrap    = document.getElementById('resultWrap');
+
+  btn.disabled = true;
+  document.getElementById('genBtnTxt').textContent = '生成中...';
+  spinner.style.display = 'block';
+  output.textContent = '';
+  output.classList.add('streaming');
+  wrap.style.display = 'block';
+  document.getElementById('regResult').innerHTML = '';
+
+  const badge = document.getElementById('resultBadge');
+  badge.textContent = TYPE_LABELS[selectedType];
+  badge.setAttribute('style', TYPE_BADGE_STYLE[selectedType]);
+  document.getElementById('resultTs').textContent = new Date().toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  wrap.scrollIntoView({ behavior:'smooth', block:'start' });
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2000,
+        stream: true,
+        system: buildSystemPrompt(),
+        messages: [{ role:'user', content: buildUserPrompt() }]
+      })
+    });
+
+    if (!res.ok) {
+      const e = await res.json().catch(()=>({}));
+      throw new Error(e.error?.message || `APIエラー ${res.status}`);
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream:true });
+      for (const line of chunk.split('\n')) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6).trim();
+        if (data === '[DONE]') continue;
+        try {
+          const p = JSON.parse(data);
+          if (p.type === 'content_block_delta' && p.delta?.text) {
+            fullText += p.delta.text;
+            output.textContent = fullText;
+          }
+        } catch {}
+      }
+    }
+
+    currentText = fullText;
+    output.classList.remove('streaming');
+    runRegCheck(fullText);
+    saveHist(fullText);
+
+  } catch(e) {
+    output.classList.remove('streaming');
+    output.innerHTML = `<span style="color:var(--fail);">⚠ エラー: ${esc(e.message)}</span>`;
+  } finally {
+    btn.disabled = false;
+    document.getElementById('genBtnTxt').textContent = '✦ クリエイティブを生成する';
+    spinner.style.display = 'none';
+  }
+}
+
+/* ═══════════════════════════════
+   INLINE REGULATION CHECK
+═══════════════════════════════ */
+function cx(text, i, l) {
+  const s=Math.max(0,i-8), e=Math.min(text.length,i+l+8);
+  return (s>0?'…':'')+text.substring(s,e)+(e<text.length?'…':'');
+}
+
+function runInlineCheck(text, type) {
+  const v = [];
+  const isPat = (type==='banner'||type==='copy'||type==='sns') ? 'full' : 'hybrid';
+
+  [...text.matchAll(/お絵描き/g)].forEach(m=>v.push({rule:'漢字表記NG',bad:m[0],good:'お絵かき',ctx:cx(text,m.index,m[0].length),desc:'「かき」はひらがなが正しい'}));
+  [...text.matchAll(/オエカキム[ーー－]ビ[ーー]/g)].forEach(m=>v.push({rule:'カタカナ表記NG',bad:m[0],good:'「お絵かきムービー®」',ctx:cx(text,m.index,m[0].length),desc:'カタカナ表記はNG'}));
+  [...text.matchAll(/お絵ム[ーー]/g)].forEach(m=>v.push({rule:'略称NG',bad:m[0],good:'「お絵かきムービー®」',ctx:cx(text,m.index,m[0].length),desc:'略称はNG'}));
+  [...text.matchAll(/認定お絵かきクリエイター/g)].forEach(m=>v.push({rule:'「認定」使用NG',bad:m[0],good:'「お絵かきクリエイター®」',ctx:cx(text,m.index,m[0].length),desc:'「認定」接頭語はNG'}));
+  [...text.matchAll(/お絵描きビデオ/g)].forEach(m=>v.push({rule:'誤商品名NG',bad:m[0],good:'「お絵かきムービー®」',ctx:cx(text,m.index,m[0].length),desc:'正式名称を使用'}));
+  [...text.matchAll(/お給料|(?<![^\s　])給料/g)].forEach(m=>v.push({rule:'就職誤解表現NG',bad:m[0],good:'収入・報酬',ctx:cx(text,m.index,m[0].length),desc:'雇用関係と誤解される'}));
+  [...text.matchAll(/絵師/g)].forEach(m=>v.push({rule:'「絵師」NG',bad:m[0],good:'「お絵かきクリエイター®」',ctx:cx(text,m.index,m[0].length),desc:'正式名称を使用'}));
+  [...text.matchAll(/絵を描くだけで/g)].forEach(m=>v.push({rule:'誇大表現NG',bad:m[0],good:'（表現を見直す）',ctx:cx(text,m.index,m[0].length),desc:'業務の過度な簡略化'}));
+  [...text.matchAll(/イラストスクール/g)].forEach(m=>v.push({rule:'事業名誤表現NG',bad:m[0],good:'お絵かきクリエイターズアカデミー',ctx:cx(text,m.index,m[0].length),desc:'正式名称を使用'}));
+  [...text.matchAll(/ワークレッスン/g)].forEach(m=>v.push({rule:'NG表現',bad:m[0],good:'（正式名称を使用）',ctx:cx(text,m.index,m[0].length),desc:'NG表現'}));
+  [...text.matchAll(/リモート完結/g)].forEach(m=>v.push({rule:'リモート完結NG',bad:m[0],good:'（正確な表現に）',ctx:cx(text,m.index,m[0].length),desc:'NG表現'}));
+  [...text.matchAll(/(?:応募|問い合わせ)(?:が)?殺到/g)].forEach(m=>v.push({rule:'誇大実績NG',bad:m[0],good:'（根拠ある表現に）',ctx:cx(text,m.index,m[0].length),desc:'事実確認できない誇大表現'}));
+
+  ['お絵かきムービー','お絵かきクリエイター'].forEach(name => {
+    const re = new RegExp(name,'g'); let m;
+    while ((m=re.exec(text))!==null) {
+      const i=m.index, l=m[0].length;
+      if (text[i-1]!=='「') {
+        v.push({rule:'カギカッコなし',bad:text.substring(Math.max(0,i-3),i+l+3),good:`「${name}${isPat==='full'?'®':''}」`,ctx:cx(text,i,l),desc:`カギカッコで囲んでください`}); return;
+      }
+      if (isPat==='full' && text[i+l]!=='®')
+        v.push({rule:'®マーク欠落',bad:`「${name}」`,good:`「${name}®」`,ctx:cx(text,i-1,l+2),desc:'このパターンは全箇所に®が必要'});
+    }
+  });
+
+  const hasKojinsa = /個人差|個人の結果|成果には差/.test(text);
+  if (!hasKojinsa) {
+    [...text.matchAll(/(?:稼げます|稼げる|儲かります|儲かる)/g)].forEach(m=>v.push({rule:'収入断言+個人差注釈なし',bad:m[0],good:`${m[0]}（※個人差があります）`,ctx:cx(text,m.index,m[0].length),desc:'断定表現には個人差注釈が必要'}));
+  }
+
+  const needsDecl = (type==='script'||type==='video');
+  const hasDecl = text.includes('株式会社アクアフィールドの登録商標')||text.includes('登録商標');
+  const seen = new Set();
+  return { violations: v.filter(x=>{const k=x.rule+x.bad;if(seen.has(k))return false;seen.add(k);return true;}), needsDecl, hasDecl };
+}
+
+function runRegCheck(text) {
+  const wrap = document.getElementById('regResult');
+  const { violations, needsDecl, hasDecl } = runInlineCheck(text, selectedType);
+  let html = '';
+
+  if (violations.length === 0) {
+    html += `<div class="reg-header reg-pass"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>商標レギュレーション：問題なし</div>`;
+  } else {
+    html += `<div class="reg-header reg-fail"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>商標レギュレーション：${violations.length}件の修正が必要</div>
+    <div class="reg-vlist">${violations.map((v,i)=>`
+      <div class="reg-vitem">
+        <div class="reg-rule">違反${i+1} ${esc(v.rule)}</div>
+        <div class="reg-rows">
+          <div class="reg-row"><span class="reg-lbl">該当箇所</span><span class="reg-val"><span class="chip-bad">${esc(v.ctx)}</span></span></div>
+          <div class="reg-row"><span class="reg-lbl">理由</span><span class="reg-val">${esc(v.desc)}</span></div>
+          <div class="reg-row"><span class="reg-lbl">修正案</span><span class="reg-val"><span class="chip-good">${esc(v.good||'')}</span></span></div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  if (needsDecl) {
+    html += hasDecl
+      ? `<div class="reg-header reg-pass" style="margin-top:8px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>権利宣言文：記載あり</div>`
+      : `<div class="reg-header reg-warn" style="margin-top:8px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>権利宣言文が必要です（末尾に追加）<br><span style="font-size:10px;margin-top:4px;display:block;opacity:.8;">※「お絵かきムービー」「お絵かきクリエイター」は株式会社アクアフィールドの登録商標です。</span></div>`;
+  }
+  wrap.innerHTML = html;
+}
+
+/* ═══════════════════════════════
+   ACTIONS
+═══════════════════════════════ */
+function copyOutput() {
+  navigator.clipboard.writeText(currentText).then(() => {
+    const btns = document.querySelectorAll('.btn-solid');
+    btns.forEach(b => { if(b.textContent==='コピー'){b.textContent='✓ コピー済み';setTimeout(()=>b.textContent='コピー',1800);} });
+  });
+}
+
+function sendToChecker() {
+  localStorage.setItem('crCheckerText', currentText);
+  window.open('reg-checker.html', '_blank');
+}
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ═══════════════════════════════
+   HISTORY
+═══════════════════════════════ */
+function saveHist(text) {
+  const { violations } = runInlineCheck(text, selectedType);
+  const lp = LP_DATA[selectedLP] || { name: document.getElementById('customName')?.value || 'カスタム' };
+  const entry = {
+    id: Date.now(),
+    type: selectedType,
+    pf: selectedPF,
+    lp: selectedLP,
+    lpName: lp.name,
+    angles: getAngles(),
+    text,
+    passed: violations.length === 0,
+    vCount: violations.length,
+    violations,
+    preview: text.replace(/\n/g,' ').trim().slice(0,80) + (text.length>80?'…':''),
+    ts: new Date().toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})
+  };
+  const hist = getHistData();
+  hist.unshift(entry);
+  if (hist.length > 50) hist.length = 50;
+  localStorage.setItem('crStudioHist', JSON.stringify(hist));
+}
+
+function getHistData() {
+  try { return JSON.parse(localStorage.getItem('crStudioHist')||'[]'); } catch { return []; }
+}
+
+function clearHist() {
+  if (!confirm('履歴をすべて削除しますか？')) return;
+  localStorage.removeItem('crStudioHist');
+  renderHist();
+}
+
+function renderHist() {
+  const data = getHistData();
+  const filterWrap = document.getElementById('histFilter');
+  const listWrap = document.getElementById('histList');
+  if (!filterWrap) return;
+
+  if (data.length === 0) {
+    filterWrap.innerHTML = '';
+    listWrap.innerHTML = `<div class="empty"><div class="empty-icon">✦</div>まだ生成履歴がありません<br><span style="font-size:11px;opacity:.7;">CR生成タブで生成すると履歴が表示されます</span></div>`;
+    return;
+  }
+
+  // Filter tabs
+  const counts = { all: data.length };
+  ['script','copy','banner','sns','video'].forEach(t => { const n=data.filter(d=>d.type===t).length; if(n>0)counts[t]=n; });
+  const tabDefs = [
+    {k:'all',l:'すべて'},{k:'script',l:'📝 台本'},{k:'copy',l:'✍️ コピー'},{k:'banner',l:'🖼️ バナー'},{k:'sns',l:'📲 SNS'},{k:'video',l:'🎬 動画企画'}
+  ];
+  filterWrap.innerHTML = tabDefs.filter(t=>t.k==='all'||counts[t.k]).map(t=>`
+    <div class="hf${histFilter===t.k?' on':''}" onclick="setHistFilter('${t.k}')">${t.l} <span class="hf-cnt">${counts[t.k]||0}</span></div>
+  `).join('');
+
+  const filtered = histFilter==='all' ? data : data.filter(d=>d.type===histFilter);
+
+  if (filtered.length === 0) {
+    listWrap.innerHTML = `<div class="empty" style="padding:20px;">この種類の履歴はありません</div>`;
+    return;
+  }
+
+  listWrap.innerHTML = `<div class="hist-list">${filtered.map(h => {
+    const typeBadgeClass = { script:'hib-script', copy:'hib-copy', banner:'hib-banner', sns:'hib-sns', video:'hib-video' }[h.type]||'hib-copy';
+    return `<div class="hist-item ${h.passed?'pass':'fail'}">
+      <div class="hi-left">
+        <div class="hi-badges">
+          <span class="hi-badge ${typeBadgeClass}">${(TYPE_LABELS[h.type]||h.type)}</span>
+          <span class="hi-badge" style="background:rgba(201,168,76,.1);color:var(--gold);">${esc(h.lpName||h.lp)}</span>
+          <span class="hi-badge" style="background:rgba(255,255,255,.06);color:var(--sub);">${esc(PF_LABELS[h.pf]||h.pf)}</span>
+        </div>
+        <div class="hi-preview">${esc(h.preview||'—')}</div>
+        <div class="hi-meta">${esc(h.ts)} · 訴求: ${esc((h.angles||[]).slice(0,2).join('、')||'—')}</div>
+        <div class="hi-detail" id="hdetail-${h.id}">
+          <div style="margin-top:12px;">
+            <div style="font-size:10px;font-weight:800;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">CR内容</div>
+            <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:12px;line-height:1.8;white-space:pre-wrap;max-height:200px;overflow-y:auto;color:var(--text);">${esc(h.text)}</div>
+            <div style="text-align:right;margin-top:8px;">
+              <button class="btn-solid" style="font-size:11px;padding:5px 14px;" onclick="navigator.clipboard.writeText(${JSON.stringify(h.text)}).then(()=>{this.textContent='✓';setTimeout(()=>this.textContent='コピー',1500)})">コピー</button>
+            </div>
+          </div>
+          ${h.violations && h.violations.length > 0 ? `
+          <div style="margin-top:12px;">
+            <div style="font-size:10px;font-weight:800;color:var(--fail);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">違反内容</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              ${h.violations.map(v=>`<div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:7px;padding:9px 12px;font-size:11px;"><span style="color:#F87171;font-weight:800;">${esc(v.rule)}</span> — ${esc(v.desc)}<br><span class="chip-bad">${esc(v.ctx)}</span> → <span class="chip-good">${esc(v.good||'')}</span></div>`).join('')}
+            </div>
+          </div>` : ''}
+        </div>
+      </div>
+      <div class="hi-right">
+        <span class="hi-status ${h.passed?'hi-ok':'hi-ng'}">${h.passed?'合格':'要修正'}</span>
+        <span style="font-size:10px;color:var(--sub2);">${esc(h.ts)}</span>
+        <button class="hi-toggle" id="htbtn-${h.id}" onclick="toggleHistDetail(${h.id})">詳細 ▼</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function setHistFilter(f) {
+  histFilter = f;
+  renderHist();
+}
+
+function toggleHistDetail(id) {
+  const detail = document.getElementById(`hdetail-${id}`);
+  const btn    = document.getElementById(`htbtn-${id}`);
+  const isOpen = detail.classList.contains('open');
+  detail.classList.toggle('open', !isOpen);
+  btn.textContent = isOpen ? '詳細 ▼' : '閉じる ▲';
+}
+</script>
+</body>
+</html>
