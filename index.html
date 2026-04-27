@@ -190,10 +190,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .hist-text-block{margin-top:14px;}
 .hist-text-lbl{font-size:10px;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;display:flex;align-items:center;gap:8px;}
 .hist-text-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
-.hist-text-box{background:#F8FAFC;border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.9;white-space:pre-wrap;word-break:break-word;color:var(--text);position:relative;max-height:200px;overflow-y:auto;}
+.hist-text-box{background:#F8FAFC;border:1px solid var(--border);border-radius:10px;padding:14px 16px 14px 16px;font-size:13px;line-height:1.9;white-space:pre-wrap;word-break:break-word;color:var(--text);position:relative;max-height:220px;overflow-y:auto;}
 .hist-text-box.fixed-text{background:#F0FDF4;border-color:var(--ok-b);}
-.hist-copy-btn{position:absolute;top:8px;right:8px;background:var(--brand);color:#fff;border:none;border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;}
+.hist-copy-btn{position:sticky;top:0;float:right;margin-left:8px;background:var(--brand);color:#fff;border:none;border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;}
 .hist-copy-btn:hover{opacity:.85;}
+/* 落ちた理由カード */
+.fail-reason-list{display:flex;flex-direction:column;gap:10px;}
+.fail-reason-card{border-radius:12px;padding:14px 16px;border:1px solid;}
+.frc-cr{background:#FDF4FF;border-color:#E9D5FF;}
+.frc-x{background:#F9FAFB;border-color:#D1D5DB;}
+.frc-meta{background:#EFF6FF;border-color:#BFDBFE;}
+.frc-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.frc-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:900;}
+.frc-icon-cr{background:#EDE9FE;color:#7C3AED;}
+.frc-icon-x{background:#F3F4F6;color:#374151;}
+.frc-icon-meta{background:#DBEAFE;color:#1877F2;}
+.frc-rule{font-size:12px;font-weight:800;line-height:1.4;}
+.frc-cr .frc-rule{color:#6D28D9;}
+.frc-x .frc-rule{color:#1F2937;}
+.frc-meta .frc-rule{color:#1D4ED8;}
+.frc-desc{font-size:12px;color:#475569;line-height:1.6;margin-bottom:10px;}
+.frc-chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.frc-arrow{color:#94A3B8;font-size:13px;flex-shrink:0;}
+.frc-pf-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;}
+.frc-pf-cr{background:#EDE9FE;color:#6D28D9;}
+.frc-pf-x{background:#F3F4F6;color:#374151;}
+.frc-pf-meta{background:#DBEAFE;color:#1E40AF;}
 
 
 /* ── BTN ── */
@@ -1024,61 +1046,88 @@ function renderHistory() {
     const xV = h.xViolations || [];
     const metaV = h.metaViolations || [];
 
-    // サマリーカウント行
+    // ① 作成したCR内容（本文）
+    const fullTextHtml = h.fullText
+      ? `<div class="hist-text-block">
+          <div class="hist-text-lbl">作成したCR内容</div>
+          <div class="hist-text-box" id="htxt-${h.id}"><button class="hist-copy-btn" onclick="doCopyById('htxt-${h.id}',this)">コピー</button>${esc(h.fullText)}</div>
+        </div>` : '';
+
+    // ② 判定サマリー
     let countHtml = '';
     if (h.passed) {
       countHtml = `<span class="hist-vcount hvc-ok">✓ すべての項目で合格</span>`;
     } else {
-      if (crV.length > 0) countHtml += `<span class="hist-vcount hvc-cr">商標 ${crV.length}件の違反</span>`;
-      else if (h.crCount === 0 && crV !== undefined) countHtml += `<span class="hist-vcount hvc-ok">商標 合格</span>`;
-      if (h.xViolations !== undefined && h.xViolations !== null) {
-        if (xV.length > 0) countHtml += `<span class="hist-vcount hvc-x">X ${xV.length}件の違反</span>`;
+      if (crV.length > 0) countHtml += `<span class="hist-vcount hvc-cr">商標 ${crV.length}件NG</span>`;
+      else if (h.crViolations !== undefined) countHtml += `<span class="hist-vcount hvc-ok">商標 合格</span>`;
+      if (h.xViolations !== null && h.xViolations !== undefined) {
+        if (xV.length > 0) countHtml += `<span class="hist-vcount hvc-x">X ${xV.length}件NG</span>`;
         else countHtml += `<span class="hist-vcount hvc-ok">X 合格</span>`;
       }
-      if (h.metaViolations !== undefined && h.metaViolations !== null) {
-        if (metaV.length > 0) countHtml += `<span class="hist-vcount hvc-meta">Meta ${metaV.length}件の違反</span>`;
+      if (h.metaViolations !== null && h.metaViolations !== undefined) {
+        if (metaV.length > 0) countHtml += `<span class="hist-vcount hvc-meta">Meta ${metaV.length}件NG</span>`;
         else countHtml += `<span class="hist-vcount hvc-ok">Meta 合格</span>`;
       }
     }
 
-    const renderVItems = (violations, iclass, rclass) => violations.map((v,i) =>
-      `<div class="hist-vitem ${iclass}">
-        <div class="hist-vitem-rule ${rclass}">違反${i+1} ${esc(v.rule)}</div>
-        <div class="hist-vitem-rows">
-          <div class="hist-vitem-row"><span class="hist-vlbl">該当箇所</span><span class="hist-vval"><span class="chip-bad">${esc(v.ctx||v.bad||'')}</span></span></div>
-          <div class="hist-vitem-row"><span class="hist-vlbl">説明</span><span class="hist-vval">${esc(v.desc||'')}</span></div>
-          <div class="hist-vitem-row"><span class="hist-vlbl">修正案</span><span class="hist-vval"><span class="chip-good">${esc(v.fix||v.good||'')}</span></span></div>
-        </div>
-      </div>`).join('');
+    // ③ なぜ落ちたか（理由カード）
+    const renderReasons = (violations, cardClass, iconClass, pfBadgeClass, pfLabel) =>
+      violations.map(v => `
+        <div class="fail-reason-card ${cardClass}">
+          <div class="frc-header">
+            <div class="frc-icon ${iconClass}">✕</div>
+            <div>
+              <div class="frc-rule">${esc(v.rule)}</div>
+            </div>
+            <span class="frc-pf-badge ${pfBadgeClass}" style="margin-left:auto;flex-shrink:0;">${pfLabel}</span>
+          </div>
+          <div class="frc-desc">${esc(v.desc || '')}</div>
+          <div class="frc-chips">
+            <span class="chip-bad">${esc(v.ctx || v.bad || '')}</span>
+            <span class="frc-arrow">→</span>
+            <span class="chip-good">${esc(v.fix || v.good || '')}</span>
+          </div>
+        </div>`).join('');
 
-    let violHtml = '';
-    if (crV.length > 0) {
-      violHtml += `<div class="hist-section-lbl">商標レギュレーション</div><div class="hist-v-list">${renderVItems(crV,'hist-vitem-cr','hvr-cr')}</div>`;
-    } else if (crV.length === 0 && h.crViolations !== undefined) {
-      violHtml += `<div class="h-ok-msg"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>商標表記に問題はありません</div>`;
-    }
-    if (h.xViolations !== null && h.xViolations !== undefined) {
-      if (xV.length > 0) violHtml += `<div class="hist-section-lbl">X広告ポリシー</div><div class="hist-v-list">${renderVItems(xV,'hist-vitem-x','hvr-x')}</div>`;
-      else violHtml += `<div class="h-ok-msg"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>X広告ポリシーに問題は見つかりませんでした</div>`;
-    }
-    if (h.metaViolations !== null && h.metaViolations !== undefined) {
-      if (metaV.length > 0) violHtml += `<div class="hist-section-lbl">Meta広告ポリシー</div><div class="hist-v-list">${renderVItems(metaV,'hist-vitem-meta','hvr-meta')}</div>`;
-      else violHtml += `<div class="h-ok-msg"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Meta広告ポリシーに問題は見つかりませんでした</div>`;
+    let reasonsHtml = '';
+    const allViolations = [
+      ...crV.map(v => ({...v, _src:'cr'})),
+      ...xV.map(v => ({...v, _src:'x'})),
+      ...metaV.map(v => ({...v, _src:'meta'}))
+    ];
+
+    if (allViolations.length > 0) {
+      const cards = allViolations.map(v => {
+        if (v._src === 'cr')   return renderReasons([v],'frc-cr','frc-icon-cr','frc-pf-cr','商標').trim();
+        if (v._src === 'x')    return renderReasons([v],'frc-x','frc-icon-x','frc-pf-x','X').trim();
+        if (v._src === 'meta') return renderReasons([v],'frc-meta','frc-icon-meta','frc-pf-meta','Meta').trim();
+        return '';
+      }).join('');
+      reasonsHtml = `<div class="hist-text-lbl" style="margin-top:16px;">なぜ落ちたのか</div><div class="fail-reason-list">${cards}</div>`;
+    } else if (!h.passed) {
+      // 旧形式エントリー（crViolations未保存）
+      reasonsHtml = `<div class="h-ok-msg" style="background:var(--warn-bg);color:var(--warn);border-color:var(--warn-b);margin-top:12px;">詳細データがありません（旧形式の履歴です）</div>`;
     }
 
-    // チェック本文 & 修正済み全文
-    const fullTextHtml = h.fullText
-      ? `<div class="hist-text-block">
-          <div class="hist-text-lbl">チェックしたテキスト</div>
-          <div class="hist-text-box" id="htxt-${h.id}">${esc(h.fullText)}<button class="hist-copy-btn" onclick="doCopyById('htxt-${h.id}',this)">コピー</button></div>
-        </div>` : '';
+    // ④ 合格メッセージ
+    let passHtml = '';
+    if (h.passed) {
+      passHtml = `<div class="h-ok-msg" style="margin-top:14px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>すべてのレギュレーションをクリアしています</div>`;
+    }
+
+    // ⑤ 修正済み全文
     const fixedTextHtml = h.fixedText
       ? `<div class="hist-text-block">
           <div class="hist-text-lbl">修正済み全文</div>
-          <div class="hist-text-box fixed-text" id="hfix-${h.id}">${esc(h.fixedText)}<button class="hist-copy-btn" onclick="doCopyById('hfix-${h.id}',this)">コピー</button></div>
+          <div class="hist-text-box fixed-text" id="hfix-${h.id}"><button class="hist-copy-btn" onclick="doCopyById('hfix-${h.id}',this)">コピー</button>${esc(h.fixedText)}</div>
         </div>` : '';
 
-    detailHtml = `<div class="hist-vcount-row">${countHtml}</div>${violHtml}${fullTextHtml}${fixedTextHtml}`;
+    detailHtml = `
+      ${fullTextHtml}
+      <div class="hist-vcount-row" style="margin-top:14px;">${countHtml}</div>
+      ${reasonsHtml}
+      ${passHtml}
+      ${fixedTextHtml}`;
 
     return `<div class="hist-card ${h.passed ? 'hc-pass' : 'hc-fail'}">
       <div class="hist-card-head">
