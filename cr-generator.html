@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>お絵かきCR クリエイティブ生成ツール</title>
+<style>
+:root {
+  --brand:#6C47FF; --brand-g:linear-gradient(135deg,#6C47FF,#9B59B6);
+  --ok:#059669; --ok-bg:#ECFDF5; --ok-b:#A7F3D0;
+  --fail:#DC2626; --fail-bg:#FEF2F2; --fail-b:#FECACA;
+  --warn:#D97706; --warn-bg:#FFFBEB; --warn-b:#FDE68A;
+  --bg:#F0F2F8; --surface:#FFFFFF; --text:#0F172A; --sub:#64748B;
+  --border:#E2E8F0; --r:16px; --r-sm:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#0F0C29,#302B63,#24243E);padding:36px 24px 32px;text-align:center;position:relative;overflow:hidden;}
+.hdr::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,rgba(108,71,255,.25) 0%,transparent 60%);pointer-events:none;}
+.hdr-inner{position:relative;max-width:820px;margin:0 auto;}
+.hdr-eyebrow{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(8px);color:rgba(255,255,255,.85);font-size:11px;font-weight:600;letter-spacing:1.2px;padding:5px 14px;border-radius:20px;margin-bottom:16px;}
+.hdr h1{font-size:26px;font-weight:800;color:#FFF;letter-spacing:-.5px;margin-bottom:6px;}
+.hdr p{font-size:13px;color:rgba(255,255,255,.55);}
+
+/* LAYOUT */
+.main{max-width:820px;margin:0 auto;padding:28px 20px 80px;}
+.card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:24px;margin-bottom:16px;box-shadow:0 1px 2px rgba(0,0,0,.03),0 4px 16px rgba(0,0,0,.06);}
+.clabel{font-size:10px;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:14px;}
+
+/* API KEY SECTION */
+.api-setup{display:flex;gap:10px;align-items:stretch;}
+.api-input{flex:1;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:11px 14px;font-size:13px;font-family:monospace;outline:none;transition:border .15s;background:#FAFBFD;color:var(--text);}
+.api-input:focus{border-color:var(--brand);}
+.api-input::placeholder{color:#CBD5E1;font-family:inherit;}
+.api-save-btn{padding:11px 20px;background:var(--brand-g);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.api-save-btn:hover{opacity:.9;}
+.api-status{margin-top:8px;font-size:12px;padding:8px 12px;border-radius:8px;display:none;}
+.api-status.ok{background:var(--ok-bg);color:var(--ok);display:block;}
+.api-status.ng{background:var(--fail-bg);color:var(--fail);display:block;}
+.api-toggle{font-size:12px;color:var(--brand);background:none;border:none;cursor:pointer;text-decoration:underline;padding:0;}
+.api-collapsed{display:flex;align-items:center;gap:10px;}
+.api-key-saved{font-size:12px;color:var(--ok);display:flex;align-items:center;gap:6px;}
+
+/* TABS */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;}
+.tab{padding:9px 18px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:#fff;font-size:13px;font-weight:500;color:var(--sub);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:7px;}
+.tab:hover{border-color:var(--brand);color:var(--brand);}
+.tab.on{border-color:var(--brand);background:#F0EBFF;color:var(--brand);font-weight:700;}
+
+/* PLATFORM ROW */
+.pf-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px;padding-top:18px;border-top:1px solid var(--border);}
+.pf-btn{flex:1;min-width:100px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;transition:all .15s;text-align:center;}
+.pf-btn:hover{border-color:var(--brand);color:var(--brand);}
+.pf-btn.on{border-color:var(--brand);background:#F0EBFF;color:var(--brand);}
+
+/* ANGLE GRID */
+.angle-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-top:10px;}
+.angle-card{padding:12px 14px;border-radius:12px;border:1.5px solid var(--border);background:#fff;cursor:pointer;transition:all .15s;position:relative;}
+.angle-card:hover{border-color:var(--brand);transform:translateY(-1px);}
+.angle-card.on{border-color:var(--brand);background:#F0EBFF;}
+.angle-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.angle-sub{font-size:11px;color:var(--sub);line-height:1.5;}
+.angle-check{position:absolute;top:10px;right:10px;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .15s;}
+.angle-card.on .angle-check{background:var(--brand);border-color:var(--brand);color:#fff;}
+
+/* NOTES INPUT */
+.notes-inp{width:100%;min-height:80px;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;font-size:13px;font-family:inherit;line-height:1.7;resize:vertical;outline:none;background:#FAFBFD;transition:border .15s;}
+.notes-inp:focus{border-color:var(--brand);background:#fff;}
+.notes-inp::placeholder{color:#C8CDD8;}
+
+/* GENERATE BTN */
+.gen-btn{width:100%;padding:16px;background:linear-gradient(135deg,#6C47FF 0%,#5B8DEF 100%);color:#fff;border:none;border-radius:var(--r-sm);font-size:15px;font-weight:800;cursor:pointer;margin-top:12px;letter-spacing:.2px;transition:transform .12s,box-shadow .12s;box-shadow:0 4px 14px rgba(108,71,255,.35);display:flex;align-items:center;justify-content:center;gap:10px;}
+.gen-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(108,71,255,.45);}
+.gen-btn:disabled{opacity:.55;cursor:not-allowed;transform:none;}
+.gen-spinner{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+.gen-btn.loading .gen-spinner{display:block;}
+.gen-btn.loading .gen-btn-txt{opacity:.7;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* RESULT */
+.result-card{display:none;}
+.result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.result-type-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:12px;font-size:11px;font-weight:800;}
+.rtb-script{background:#D1FAE5;color:#065F46;}
+.rtb-copy{background:#EDE9FE;color:#6D28D9;}
+.rtb-banner{background:#FEF3C7;color:#B45309;}
+.rtb-video{background:#FEE2E2;color:#B91C1C;}
+
+/* GENERATED TEXT BOX */
+.gen-output-wrap{margin-bottom:16px;}
+.gen-output-lbl{font-size:10px;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.gen-output-box{background:#F8FAFC;border:1.5px solid var(--border);border-radius:12px;padding:20px;font-size:14px;line-height:2;white-space:pre-wrap;word-break:break-word;color:var(--text);position:relative;min-height:120px;}
+.gen-output-box.streaming::after{content:'▌';animation:blink .6s step-end infinite;}
+@keyframes blink{50%{opacity:0}}
+.copy-row{display:flex;gap:8px;margin-top:10px;justify-content:flex-end;}
+.copy-btn-sm{padding:7px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;}
+.copy-btn-sm:hover{opacity:.85;}
+.regen-btn{padding:7px 16px;background:#fff;color:var(--brand);border:1.5px solid var(--brand);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;}
+.regen-btn:hover{background:#F0EBFF;}
+
+/* REG CHECK RESULT */
+.reg-check-wrap{margin-top:6px;}
+.reg-check-header{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;font-size:13px;font-weight:700;}
+.rch-pass{background:var(--ok-bg);color:var(--ok);border:1.5px solid var(--ok-b);}
+.rch-fail{background:var(--fail-bg);color:var(--fail);border:1.5px solid var(--fail-b);}
+.reg-vlist{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.reg-vitem{background:#FAF5FF;border-radius:10px;padding:12px 14px;border:1px solid #DDD6FE;}
+.reg-vitem-rule{font-size:10px;font-weight:800;color:#7C3AED;letter-spacing:.4px;margin-bottom:7px;text-transform:uppercase;}
+.reg-vrows{display:flex;flex-direction:column;gap:5px;}
+.reg-vrow{display:flex;gap:10px;align-items:flex-start;}
+.reg-vlbl{font-size:10px;font-weight:700;color:#94A3B8;min-width:52px;padding-top:2px;flex-shrink:0;}
+.reg-vval{font-size:12px;color:var(--text);line-height:1.6;}
+.chip-bad{background:var(--fail-bg);color:var(--fail);padding:2px 8px;border-radius:5px;font-family:monospace;font-size:12px;}
+.chip-good{background:var(--ok-bg);color:var(--ok);padding:2px 8px;border-radius:5px;font-family:monospace;font-size:12px;}
+.fixed-wrap-sm{margin-top:12px;}
+.fixed-lbl{font-size:10px;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.fixed-box{background:#F0FDF4;border:1px solid var(--ok-b);border-radius:10px;padding:16px;font-size:13px;line-height:1.9;white-space:pre-wrap;word-break:break-word;color:var(--text);}
+
+/* HISTORY MINI */
+.gen-hist-list{display:flex;flex-direction:column;gap:8px;}
+.gen-hist-item{padding:12px 14px;border-radius:11px;border:1.5px solid var(--border);background:#fff;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px;}
+.gen-hist-item:hover{border-color:var(--brand);background:#F8F5FF;}
+.ghi-badge{font-size:11px;font-weight:800;padding:3px 9px;border-radius:10px;flex-shrink:0;}
+.ghi-script{background:#D1FAE5;color:#065F46;}
+.ghi-copy{background:#EDE9FE;color:#6D28D9;}
+.ghi-banner{background:#FEF3C7;color:#B45309;}
+.ghi-video{background:#FEE2E2;color:#B91C1C;}
+.ghi-body{flex:1;min-width:0;}
+.ghi-preview{font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ghi-meta{font-size:11px;color:#94A3B8;flex-shrink:0;}
+.ghi-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;flex-shrink:0;}
+.ghi-ok{background:var(--ok-bg);color:var(--ok);}
+.ghi-ng{background:var(--fail-bg);color:var(--fail);}
+.hist-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.hist-clear-sm{font-size:11px;color:#94A3B8;background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;}
+.hist-clear-sm:hover{color:var(--fail);border-color:var(--fail);}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-eyebrow">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      お絵かきクリエイターズ
+    </div>
+    <h1>クリエイティブ自動生成ツール</h1>
+    <p>レギュレーション準拠のCRを AI が自動生成 &nbsp;·&nbsp; 商標チェック内蔵</p>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- API Key -->
+  <div class="card" id="apiCard">
+    <div class="clabel">Claude API キー設定</div>
+    <div id="apiSetupWrap">
+      <div class="api-setup">
+        <input class="api-input" id="apiKeyInput" type="password" placeholder="sk-ant-api03-..." autocomplete="off">
+        <button class="api-save-btn" onclick="saveApiKey()">保存</button>
+      </div>
+      <div id="apiStatus" class="api-status"></div>
+      <div style="margin-top:8px;font-size:11px;color:var(--sub);">APIキーは端末のlocalStorageに保存されます。外部には送信されません。</div>
+    </div>
+    <div id="apiSavedWrap" style="display:none;" class="api-collapsed">
+      <div class="api-key-saved">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+        APIキー設定済み
+      </div>
+      <button class="api-toggle" onclick="resetApiKey()">変更する</button>
+    </div>
+  </div>
+
+  <!-- 生成フォーム -->
+  <div class="card">
+    <div class="clabel">クリエイティブの種類</div>
+    <div class="tabs" id="typeTabs">
+      <button class="tab on" data-type="script">📝 台本</button>
+      <button class="tab" data-type="copy">✍️ コピー</button>
+      <button class="tab" data-type="banner">🖼️ バナー文案</button>
+      <button class="tab" data-type="video">🎬 動画企画</button>
+    </div>
+
+    <!-- プラットフォーム -->
+    <div class="pf-row">
+      <div class="clabel" style="width:100%;margin-bottom:8px;">配信プラットフォーム</div>
+      <button class="pf-btn on" data-pf="x" onclick="selectPF(this)">X（Twitter）</button>
+      <button class="pf-btn" data-pf="meta" onclick="selectPF(this)">Meta / Instagram</button>
+      <button class="pf-btn" data-pf="youtube" onclick="selectPF(this)">YouTube</button>
+      <button class="pf-btn" data-pf="lp" onclick="selectPF(this)">LP / HP</button>
+      <button class="pf-btn" data-pf="other" onclick="selectPF(this)">その他</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="clabel">訴求軸を選択（複数可）</div>
+    <div class="angle-grid" id="angleGrid">
+      <div class="angle-card" data-angle="income" onclick="toggleAngle(this)">
+        <div class="angle-check"></div>
+        <div class="angle-title">収入・在宅独立</div>
+        <div class="angle-sub">在宅で収入を得る働き方。個人差注釈付きで訴求</div>
+      </div>
+      <div class="angle-card on" data-angle="hobby" onclick="toggleAngle(this)">
+        <div class="angle-check">✓</div>
+        <div class="angle-title">好きを仕事に</div>
+        <div class="angle-sub">絵が好き・ものづくりが好きを職業にしたい方へ</div>
+      </div>
+      <div class="angle-card" data-angle="housewife" onclick="toggleAngle(this)">
+        <div class="angle-check"></div>
+        <div class="angle-title">主婦・育児両立</div>
+        <div class="angle-sub">子育てしながら自分の時間で働ける仕事</div>
+      </div>
+      <div class="angle-card" data-angle="beginner" onclick="toggleAngle(this)">
+        <div class="angle-check"></div>
+        <div class="angle-title">未経験スタート</div>
+        <div class="angle-sub">絵の経験ゼロ・PCスキル不要から始められる</div>
+      </div>
+      <div class="angle-card" data-angle="freedom" onclick="toggleAngle(this)">
+        <div class="angle-check"></div>
+        <div class="angle-title">自由な働き方</div>
+        <div class="angle-sub">場所・時間を選ばないクリエイター活動</div>
+      </div>
+      <div class="angle-card" data-angle="career" onclick="toggleAngle(this)">
+        <div class="angle-check"></div>
+        <div class="angle-title">副業・転職</div>
+        <div class="angle-sub">本業の傍らで、または新たなキャリアとして</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="clabel">追加の指示・ターゲット詳細（任意）</div>
+    <textarea class="notes-inp" id="notesInput" placeholder="例：30代の主婦向けにやさしいトーンで。Instagramリール用に前半15秒で共感を掴む構成にしてほしい。"></textarea>
+    <button class="gen-btn" id="genBtn" onclick="generate()">
+      <div class="gen-spinner" id="genSpinner"></div>
+      <span class="gen-btn-txt" id="genBtnTxt">クリエイティブを生成する　→</span>
+    </button>
+  </div>
+
+  <!-- 生成結果 -->
+  <div class="card result-card" id="resultCard">
+    <div class="result-header">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 3px rgba(108,71,255,.2);"></div>
+        <span style="font-size:13px;font-weight:800;">生成結果</span>
+        <span class="result-type-badge" id="resultTypeBadge"></span>
+      </div>
+      <div style="font-size:11px;color:#94A3B8;" id="resultTs"></div>
+    </div>
+
+    <div class="gen-output-wrap">
+      <div class="gen-output-lbl">
+        <span>生成されたクリエイティブ</span>
+      </div>
+      <div class="gen-output-box" id="genOutput"></div>
+      <div class="copy-row">
+        <button class="regen-btn" onclick="generate()">再生成</button>
+        <button class="copy-btn-sm" onclick="copyOutput()">コピー</button>
+      </div>
+    </div>
+
+    <div class="reg-check-wrap" id="regCheckWrap"></div>
+  </div>
+
+  <!-- 生成履歴 -->
+  <div class="card" id="genHistCard" style="display:none;">
+    <div class="hist-header">
+      <div class="clabel" style="margin-bottom:0;">生成履歴</div>
+      <button class="hist-clear-sm" onclick="clearGenHist()">すべて削除</button>
+    </div>
+    <div id="genHistList" class="gen-hist-list"></div>
+  </div>
+
+</div>
+
+<script>
+/* ─── State ─── */
+let crType = 'script';
+let crPlatform = 'x';
+let currentGenText = '';
+
+const TYPE_LABELS = { script:'📝 台本', copy:'✍️ コピー', banner:'🖼️ バナー文案', video:'🎬 動画企画' };
+const TYPE_BADGE  = { script:'rtb-script', copy:'rtb-copy', banner:'rtb-banner', video:'rtb-video' };
+const TYPE_BADGE_SMALL = { script:'ghi-script', copy:'ghi-copy', banner:'ghi-banner', video:'ghi-video' };
+const PF_LABELS   = { x:'X（Twitter）', meta:'Meta / Instagram', youtube:'YouTube', lp:'LP・HP', other:'その他' };
+
+/* ─── API Key ─── */
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('crGenApiKey');
+  if (saved) showSavedState();
+  renderGenHist();
+});
+
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  const st = document.getElementById('apiStatus');
+  if (!key.startsWith('sk-ant-')) {
+    st.className = 'api-status ng'; st.textContent = '⚠ APIキーの形式が正しくありません（sk-ant-api... で始まるキーを入力してください）'; return;
+  }
+  localStorage.setItem('crGenApiKey', key);
+  st.className = 'api-status ok'; st.textContent = '✓ APIキーを保存しました';
+  setTimeout(() => showSavedState(), 800);
+}
+
+function showSavedState() {
+  document.getElementById('apiSetupWrap').style.display = 'none';
+  document.getElementById('apiSavedWrap').style.display = 'flex';
+}
+
+function resetApiKey() {
+  document.getElementById('apiSetupWrap').style.display = 'block';
+  document.getElementById('apiSavedWrap').style.display = 'none';
+  document.getElementById('apiKeyInput').value = '';
+  document.getElementById('apiStatus').className = 'api-status';
+}
+
+/* ─── Tabs ─── */
+document.querySelectorAll('#typeTabs .tab').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#typeTabs .tab').forEach(t => t.classList.remove('on'));
+  b.classList.add('on');
+  crType = b.dataset.type;
+}));
+
+function selectPF(btn) {
+  document.querySelectorAll('.pf-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  crPlatform = btn.dataset.pf;
+}
+
+function toggleAngle(card) {
+  card.classList.toggle('on');
+  const chk = card.querySelector('.angle-check');
+  chk.textContent = card.classList.contains('on') ? '✓' : '';
+}
+
+function getSelectedAngles() {
+  return [...document.querySelectorAll('.angle-card.on')].map(c => {
+    const map = {
+      income:'収入・在宅独立（個人差注釈必須）',
+      hobby:'好きを仕事にしたい方への訴求',
+      housewife:'主婦・育児との両立',
+      beginner:'未経験・スキルゼロからのスタート',
+      freedom:'場所・時間を選ばない自由な働き方',
+      career:'副業・転職・新しいキャリア'
+    };
+    return map[c.dataset.angle] || c.dataset.angle;
+  });
+}
+
+/* ─── System Prompt ─── */
+function buildSystemPrompt() {
+  return `あなたは「お絵かきクリエイターズアカデミー」専属のクリエイティブディレクターです。
+以下のレギュレーションとサービス情報を完全に把握し、魅力的かつ規約準拠のクリエイティブを生成してください。
+
+## サービス情報
+- 運営: 株式会社アクアフィールド
+- サービス名: お絵かきクリエイターズアカデミー
+- コンセプト: 「好きを仕事にして、豊かに自由に生きる」
+- 内容: 「お絵かきムービー®」（ストーリーを絵で伝えるアニメーション動画）の制作技術と販売方法を学べる起業スクール
+- 公式HP: https://creators-academy.co.jp/about/
+- 実績: 累計3,000名以上参加、卒業生総売上7億円超、参加者の95%が絵の経験ゼロからスタート
+- 卒業生事例: 月収35万〜100万円超（※個人差があります）、最高2,040万円の実績あり
+- ターゲット: 絵を描くのが好きな方・ものづくりが好きな方・好きを仕事にしたい主婦・転職・副業希望者
+- 入学プロセス: 体験会 → 電話診断 → 面談合格で入学
+- 学習形式: オンライン完結、5日間集中ワークショップ、診断型ビデオセミナー
+
+## 【商標表記 絶対ルール】
+
+### バナー・コピー → フル表記パターン
+すべての箇所に®マークが必要：
+- 正しい例: 「お絵かきムービー®」「お絵かきクリエイター®」
+- カギカッコ（「」）は必須
+
+### 台本・動画企画 → ハイブリッドパターン
+- 初出のみ「お絵かきムービー®」「お絵かきクリエイター®」
+- 2回目以降は「お絵かきムービー」「お絵かきクリエイター」（カギカッコのみ、®なし）
+- テキスト末尾に必ず権利宣言文を追加:
+  ※「お絵かきムービー」「お絵かきクリエイター」は株式会社アクアフィールドの登録商標です。
+
+## 【絶対NG表現リスト】
+以下の表現は絶対に使用禁止:
+1. お絵描き（漢字）→ 必ず「お絵かき」（ひらがな）
+2. オエカキムービー（カタカナ）→ NG
+3. お絵ムー（略称）→ NG
+4. 認定お絵かきクリエイター →「認定」の接頭語はNG
+5. お絵描きビデオ → NG
+6. お給料・給料 → NG（就職・雇用関係と誤解される）
+7. 絵師 → NG（「お絵かきクリエイター®」と表記）
+8. 絵を描くだけで〜 → NG（業務の過度な簡略化）
+9. 売れる絵を学べる → NG
+10. イラストスクール → NG（「お絵かきクリエイターズアカデミー」が正式名称）
+11. ワークレッスン → NG
+12. 公的機関から受賞・国から受賞 → NG
+13. 殺到・1万人以上（根拠なし）→ NG
+14. リモート完結 → NG
+15. ネットで探せばゴロゴロ → NG
+
+## 【収入表現のルール】
+- 具体的な収入数字（月収○万円等）には必ず「※個人差があります」または「※成果は個人によって異なります」を付記
+- 「必ず稼げる」「絶対に」「確実に」などの保証表現はNG
+- 「目指せる」「可能性がある」など可能性を示す表現に留める
+
+## 出力形式
+生成するテキストのみを出力してください。説明文や前置きは不要です。`;
+}
+
+function buildUserPrompt() {
+  const angles = getSelectedAngles();
+  const notes  = document.getElementById('notesInput').value.trim();
+  const pfLabel = PF_LABELS[crPlatform] || crPlatform;
+
+  const typeInstructions = {
+    script: `【台本】を作成してください。
+形式: 約60〜90秒の動画ナレーション台本
+構成:
+- 冒頭（0〜15秒）: 視聴者への共感・問題提起
+- 中盤（15〜60秒）: 「お絵かきムービー®」「お絵かきクリエイター®」の紹介、ベネフィット
+- ラスト（60〜90秒）: CTA（体験会・診断LP誘導）
+- 末尾: 権利宣言文を必ず記載
+商標パターン: ハイブリッド（冒頭のみ®付き、2回目以降カギカッコのみ）`,
+
+    copy: `【広告コピー】を作成してください。
+形式: 以下3点をセットで作成
+1. ヘッドライン（20文字以内・インパクト重視）
+2. サブコピー（40〜60文字・ベネフィット訴求）
+3. ボディコピー（100〜150文字・詳細説明）
+4. CTA文言（15文字以内）
+商標パターン: フル（すべての箇所に®付き）`,
+
+    banner: `【バナー広告の文案】を3パターン（A/B/C）作成してください。
+各パターン:
+- キャッチコピー（15文字以内）
+- サブコピー（25文字以内）
+- CTAボタン文言（10文字以内）
+- 推奨サイズ: 1200×628px想定
+商標パターン: フル（すべての箇所に®付き）`,
+
+    video: `【動画企画書】を作成してください。
+形式:
+1. タイトル案（3パターン）
+2. 動画概要（サムネイル文言含む）
+3. 構成案（冒頭30秒・中盤・ラスト30秒の要点）
+4. キーメッセージ
+5. CTA
+商標パターン: ハイブリッド（冒頭のみ®付き、2回目以降カギカッコのみ）+ 末尾に権利宣言文`
+  };
+
+  return `${typeInstructions[crType]}
+
+プラットフォーム: ${pfLabel}
+訴求軸: ${angles.length > 0 ? angles.join('、') : '全般'}
+${notes ? `追加指示: ${notes}` : ''}
+
+レギュレーションを完全に守りながら、ターゲットの心に響く魅力的なクリエイティブを生成してください。`;
+}
+
+/* ─── Generate ─── */
+async function generate() {
+  const apiKey = localStorage.getItem('crGenApiKey');
+  if (!apiKey) { alert('先にAPIキーを設定してください。'); return; }
+
+  const btn = document.getElementById('genBtn');
+  const output = document.getElementById('genOutput');
+  const resultCard = document.getElementById('resultCard');
+
+  btn.disabled = true;
+  btn.classList.add('loading');
+  document.getElementById('genBtnTxt').textContent = '生成中...';
+  output.textContent = '';
+  output.classList.add('streaming');
+  resultCard.style.display = 'block';
+  document.getElementById('regCheckWrap').innerHTML = '';
+  document.getElementById('resultTypeBadge').className = `result-type-badge ${TYPE_BADGE[crType]}`;
+  document.getElementById('resultTypeBadge').textContent = TYPE_LABELS[crType];
+  document.getElementById('resultTs').textContent = new Date().toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  resultCard.scrollIntoView({ behavior:'smooth', block:'start' });
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2000,
+        stream: true,
+        system: buildSystemPrompt(),
+        messages: [{ role:'user', content: buildUserPrompt() }]
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `APIエラー ${res.status}`);
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream:true });
+      for (const line of chunk.split('\n')) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6).trim();
+        if (data === '[DONE]') continue;
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+            fullText += parsed.delta.text;
+            output.textContent = fullText;
+          }
+        } catch {}
+      }
+    }
+
+    currentGenText = fullText;
+    output.classList.remove('streaming');
+    runRegCheck(fullText);
+    saveGenHist(fullText);
+
+  } catch (e) {
+    output.classList.remove('streaming');
+    output.textContent = `⚠ エラーが発生しました: ${e.message}`;
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+    document.getElementById('genBtnTxt').textContent = 'クリエイティブを生成する　→';
+  }
+}
+
+/* ─── Inline Regulation Check ─── */
+function c(text, i, l) {
+  const s = Math.max(0, i-8), e = Math.min(text.length, i+l+8);
+  return (s>0?'…':'')+text.substring(s,e)+(e<text.length?'…':'');
+}
+
+const pattern = (crType === 'banner' || crType === 'copy') ? 'full' : 'hybrid';
+
+function getPatternForType(type) {
+  return (type === 'banner' || type === 'copy') ? 'full' : 'hybrid';
+}
+
+function runInlineCheck(text, type) {
+  const v = [];
+  const pat = getPatternForType(type);
+
+  // 基本NG
+  [...text.matchAll(/お絵描き/g)].forEach(m => v.push({ rule:'漢字表記NG', bad:m[0], good:'お絵かき', ctx:c(text,m.index,m[0].length), desc:'「かき」はひらがなが正しい。「描き」（漢字）はNGです。' }));
+  [...text.matchAll(/オエカキム[ーー－]ビ[ーー]/g)].forEach(m => v.push({ rule:'カタカナ表記NG', bad:m[0], good:'「お絵かきムービー®」', ctx:c(text,m.index,m[0].length), desc:'カタカナ表記はNGです。' }));
+  [...text.matchAll(/お絵ム[ーー]/g)].forEach(m => v.push({ rule:'略称NG', bad:m[0], good:'「お絵かきムービー®」', ctx:c(text,m.index,m[0].length), desc:'略称はNGです。' }));
+  [...text.matchAll(/認定お絵かきクリエイター/g)].forEach(m => v.push({ rule:'「認定」使用NG', bad:m[0], good:'「お絵かきクリエイター®」', ctx:c(text,m.index,m[0].length), desc:'「認定」の接頭語はNGです。' }));
+  [...text.matchAll(/お絵描きビデオ/g)].forEach(m => v.push({ rule:'誤った商品名NG', bad:m[0], good:'「お絵かきムービー®」', ctx:c(text,m.index,m[0].length), desc:'「お絵描きビデオ」はNGです。' }));
+  [...text.matchAll(/お給料|(?<![^\s　])給料/g)].forEach(m => v.push({ rule:'就職誤解表現NG', bad:m[0], good:'収入・報酬', ctx:c(text,m.index,m[0].length), desc:'「給料」は雇用関係と誤解されます。' }));
+  [...text.matchAll(/絵師/g)].forEach(m => v.push({ rule:'「絵師」表現NG', bad:m[0], good:'「お絵かきクリエイター®」', ctx:c(text,m.index,m[0].length), desc:'「絵師」はNGです。' }));
+  [...text.matchAll(/絵を描くだけで/g)].forEach(m => v.push({ rule:'誇大表現NG', bad:m[0], good:'（表現を見直す）', ctx:c(text,m.index,m[0].length), desc:'誇大表現です。' }));
+  [...text.matchAll(/イラストスクール/g)].forEach(m => v.push({ rule:'事業名誤表現NG', bad:m[0], good:'お絵かきクリエイターズアカデミー', ctx:c(text,m.index,m[0].length), desc:'正式名称を使用してください。' }));
+  [...text.matchAll(/ワークレッスン/g)].forEach(m => v.push({ rule:'誤表現NG', bad:m[0], good:'（正式名称を使用）', ctx:c(text,m.index,m[0].length), desc:'NG表現です。' }));
+  [...text.matchAll(/リモート完結/g)].forEach(m => v.push({ rule:'リモート完結表現NG', bad:m[0], good:'（正確な表現に変更）', ctx:c(text,m.index,m[0].length), desc:'「リモート完結」はNGです。' }));
+  [...text.matchAll(/(?:応募|問い合わせ)(?:が|は)?殺到/g)].forEach(m => v.push({ rule:'誇大実績NG', bad:m[0], good:'（根拠ある表現に）', ctx:c(text,m.index,m[0].length), desc:'事実確認できない誇大表現です。' }));
+
+  // カギカッコ・®チェック
+  ['お絵かきムービー','お絵かきクリエイター'].forEach(name => {
+    const re = new RegExp(name,'g'); let m;
+    while ((m=re.exec(text))!==null) {
+      const i=m.index, l=m[0].length;
+      if (text[i-1] !== '「') {
+        v.push({ rule:'カギカッコなし', bad:text.substring(Math.max(0,i-3),i+l+3), good:`「${name}${pat==='full'?'®':''}」`, ctx:c(text,i,l), desc:`「${name}」はカギカッコで囲んでください。` }); return;
+      }
+      if (pat==='full' && text[i+l]!=='®')
+        v.push({ rule:'®マーク欠落', bad:`「${name}」`, good:`「${name}®」`, ctx:c(text,i-1,l+2), desc:'このパターンはすべての箇所に®が必要です。' });
+    }
+  });
+
+  // 収入断言
+  const hasKojinsa = /個人差|個人の結果|結果には差|成果には差/.test(text);
+  if (!hasKojinsa) {
+    [...text.matchAll(/(?:稼げます|稼げる|儲かります|儲かる)/g)].forEach(m => v.push({ rule:'収入断言・個人差注釈なし', bad:m[0], good:`${m[0]}（※個人差があります）`, ctx:c(text,m.index,m[0].length), desc:'断定表現には「※個人差があります」が必要です。' }));
+  }
+
+  // 権利宣言チェック（台本・動画）
+  const needsDecl = (type === 'script' || type === 'video');
+  const hasDecl = text.includes('株式会社アクアフィールドの登録商標') || text.includes('登録商標');
+
+  const seen = new Set();
+  return { violations: v.filter(x => { const k=x.rule+x.bad; if(seen.has(k))return false; seen.add(k); return true; }), needsDecl, hasDecl };
+}
+
+function runRegCheck(text) {
+  const wrap = document.getElementById('regCheckWrap');
+  const { violations, needsDecl, hasDecl } = runInlineCheck(text, crType);
+
+  let html = '';
+  if (violations.length === 0) {
+    html += `<div class="reg-check-header rch-pass">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+      商標レギュレーション：問題なし
+    </div>`;
+  } else {
+    html += `<div class="reg-check-header rch-fail">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      商標レギュレーション：${violations.length}件の修正が必要
+    </div>
+    <div class="reg-vlist">${violations.map((v,i) => `
+      <div class="reg-vitem">
+        <div class="reg-vitem-rule">違反${i+1} ${esc(v.rule)}</div>
+        <div class="reg-vrows">
+          <div class="reg-vrow"><span class="reg-vlbl">該当箇所</span><span class="reg-vval"><span class="chip-bad">${esc(v.ctx)}</span></span></div>
+          <div class="reg-vrow"><span class="reg-vlbl">理由</span><span class="reg-vval">${esc(v.desc)}</span></div>
+          <div class="reg-vrow"><span class="reg-vlbl">修正案</span><span class="reg-vval"><span class="chip-good">${esc(v.good||'')}</span></span></div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  if (needsDecl) {
+    html += hasDecl
+      ? `<div class="reg-check-header rch-pass" style="margin-top:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>権利宣言文：記載あり</div>`
+      : `<div class="reg-check-header rch-fail" style="margin-top:8px;background:var(--warn-bg);color:var(--warn);border-color:var(--warn-b);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+          権利宣言文が必要です：末尾に追加してください<br>
+          <span style="font-size:11px;opacity:.8;margin-top:4px;display:block;">※「お絵かきムービー」「お絵かきクリエイター」は株式会社アクアフィールドの登録商標です。</span>
+        </div>`;
+  }
+
+  wrap.innerHTML = html;
+}
+
+/* ─── Copy output ─── */
+function copyOutput() {
+  navigator.clipboard.writeText(currentGenText).then(() => {
+    const btn = document.querySelector('.copy-btn-sm');
+    btn.textContent = '✓ コピー済み';
+    setTimeout(() => btn.textContent = 'コピー', 1800);
+  });
+}
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ─── Generation History ─── */
+function saveGenHist(text) {
+  const { violations } = runInlineCheck(text, crType);
+  const entry = {
+    id: Date.now(),
+    type: crType,
+    platform: crPlatform,
+    angles: getSelectedAngles(),
+    text,
+    passed: violations.length === 0,
+    violationCount: violations.length,
+    preview: text.replace(/\n/g,' ').trim().slice(0,70) + (text.length>70?'…':''),
+    ts: new Date().toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})
+  };
+  const hist = getGenHist();
+  hist.unshift(entry);
+  if (hist.length > 30) hist.length = 30;
+  localStorage.setItem('crGenHistory', JSON.stringify(hist));
+  renderGenHist();
+}
+
+function getGenHist() {
+  try { return JSON.parse(localStorage.getItem('crGenHistory') || '[]'); } catch { return []; }
+}
+
+function clearGenHist() {
+  if (!confirm('生成履歴をすべて削除しますか？')) return;
+  localStorage.removeItem('crGenHistory');
+  renderGenHist();
+}
+
+function renderGenHist() {
+  const hist = getGenHist();
+  const card = document.getElementById('genHistCard');
+  const list = document.getElementById('genHistList');
+  if (hist.length === 0) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+
+  list.innerHTML = hist.map(h => `
+    <div class="gen-hist-item" onclick="restoreGenHist(${h.id})">
+      <span class="ghi-badge ${TYPE_BADGE_SMALL[h.type]||'ghi-copy'}">${(TYPE_LABELS[h.type]||h.type)}</span>
+      <div class="ghi-body">
+        <div class="ghi-preview">${esc(h.preview||'—')}</div>
+        <div style="font-size:10px;color:#94A3B8;margin-top:3px;">${esc(PF_LABELS[h.platform]||h.platform)} · ${esc(h.ts)}</div>
+      </div>
+      <span class="ghi-status ${h.passed?'ghi-ok':'ghi-ng'}">${h.passed?'合格':'要修正'}</span>
+    </div>`).join('');
+}
+
+function restoreGenHist(id) {
+  const h = getGenHist().find(x => x.id === id);
+  if (!h) return;
+  currentGenText = h.text;
+  crType = h.type;
+  crPlatform = h.platform;
+
+  // タブ更新
+  document.querySelectorAll('#typeTabs .tab').forEach(t => t.classList.toggle('on', t.dataset.type === h.type));
+  document.querySelectorAll('.pf-btn').forEach(b => b.classList.toggle('on', b.dataset.pf === h.platform));
+
+  const output = document.getElementById('genOutput');
+  output.textContent = h.text;
+  document.getElementById('resultTypeBadge').className = `result-type-badge ${TYPE_BADGE[h.type]}`;
+  document.getElementById('resultTypeBadge').textContent = TYPE_LABELS[h.type];
+  document.getElementById('resultTs').textContent = h.ts;
+  document.getElementById('resultCard').style.display = 'block';
+  runRegCheck(h.text);
+  document.getElementById('resultCard').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+</script>
+</body>
+</html>
