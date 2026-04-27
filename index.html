@@ -7,779 +7,561 @@
 <style>
 :root {
   --brand: #6C47FF;
-  --brand-dark: #5035CC;
-  --brand-light: #EEE9FF;
-  --x-color: #000000;
-  --x-light: #F0F0F0;
-  --meta-color: #1877F2;
-  --meta-light: #E7F0FD;
-  --cr-color: #7C3AED;
-  --cr-light: #EDE9FE;
-  --ok: #16A34A;
-  --ok-bg: #F0FDF4;
-  --ok-border: #86EFAC;
-  --warn: #D97706;
-  --warn-bg: #FFFBEB;
-  --warn-border: #FCD34D;
-  --fail: #DC2626;
-  --fail-bg: #FEF2F2;
-  --fail-border: #FCA5A5;
-  --bg: #F4F6FA;
+  --brand-g: linear-gradient(135deg,#6C47FF,#9B59B6);
+  --ok: #059669; --ok-bg: #ECFDF5; --ok-b: #A7F3D0;
+  --fail: #DC2626; --fail-bg: #FEF2F2; --fail-b: #FECACA;
+  --warn: #D97706; --warn-bg: #FFFBEB; --warn-b: #FDE68A;
+  --bg: #F0F2F8;
   --surface: #FFFFFF;
-  --text: #111827;
-  --muted: #6B7280;
-  --border: #E5E7EB;
-  --radius: 14px;
-  --radius-sm: 8px;
+  --text: #0F172A;
+  --sub: #64748B;
+  --border: #E2E8F0;
+  --r: 16px; --r-sm: 10px;
 }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── HEADER ── */
+.hdr{background:linear-gradient(135deg,#0F0C29,#302B63,#24243E);padding:36px 24px 32px;text-align:center;position:relative;overflow:hidden;}
+.hdr::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,rgba(108,71,255,.25) 0%,transparent 60%);pointer-events:none;}
+.hdr-inner{position:relative;max-width:780px;margin:0 auto;}
+.hdr-eyebrow{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(8px);color:rgba(255,255,255,.85);font-size:11px;font-weight:600;letter-spacing:1.2px;padding:5px 14px;border-radius:20px;margin-bottom:16px;}
+.hdr h1{font-size:28px;font-weight:800;color:#FFF;letter-spacing:-0.5px;margin-bottom:6px;}
+.hdr p{font-size:13px;color:rgba(255,255,255,.55);letter-spacing:.3px;}
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic UI', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-}
+/* ── LAYOUT ── */
+.main{max-width:780px;margin:0 auto;padding:28px 20px 80px;}
 
-/* ===== HEADER ===== */
-.app-header {
-  background: linear-gradient(135deg, #6C47FF 0%, #9B59B6 50%, #5B8DEF 100%);
-  padding: 32px 24px 28px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-.app-header::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-}
-.header-inner { position: relative; max-width: 800px; margin: 0 auto; }
-.header-tag {
-  display: inline-block;
-  background: rgba(255,255,255,0.2);
-  color: white;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 20px;
-  letter-spacing: 1px;
-  margin-bottom: 12px;
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(255,255,255,0.25);
-}
-.app-header h1 {
-  font-size: 26px;
-  font-weight: 800;
-  color: white;
-  letter-spacing: -0.5px;
-  margin-bottom: 6px;
-}
-.app-header p {
-  font-size: 13px;
-  color: rgba(255,255,255,0.75);
-}
+/* ── CARD ── */
+.card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:24px;margin-bottom:16px;box-shadow:0 1px 2px rgba(0,0,0,.03),0 4px 16px rgba(0,0,0,.06);}
+.clabel{font-size:10px;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:14px;}
 
-/* ===== LAYOUT ===== */
-.main { max-width: 800px; margin: 0 auto; padding: 24px 20px 60px; }
+/* ── MEDIA TABS ── */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;}
+.tab{padding:9px 18px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:#fff;font-size:13px;font-weight:500;color:var(--sub);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:7px;}
+.tab:hover{border-color:var(--brand);color:var(--brand);}
+.tab.on{border-color:var(--brand);background:#F0EBFF;color:var(--brand);font-weight:700;}
+.hint{margin-top:10px;font-size:12px;color:var(--sub);background:#F8FAFC;padding:9px 13px;border-radius:8px;line-height:1.6;border-left:3px solid var(--brand);}
 
-/* ===== CARD ===== */
-.card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  padding: 22px;
-  margin-bottom: 16px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05);
-}
-.card-label {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 14px;
-}
+/* ── PLATFORM CARDS ── */
+.pf-row{display:flex;gap:12px;margin-top:18px;padding-top:18px;border-top:1px solid var(--border);flex-wrap:wrap;}
+.pf-label{font-size:10px;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:1.2px;width:100%;margin-bottom:2px;}
+.pf-card{flex:1;min-width:160px;border-radius:14px;border:2px solid var(--border);padding:16px 18px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:12px;background:#fff;position:relative;overflow:hidden;user-select:none;}
+.pf-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .18s;}
+.pf-card:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.1);}
 
-/* ===== MEDIA TABS ===== */
-.tab-group {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.tab-btn {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1.5px solid var(--border);
-  background: white;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--muted);
-  cursor: pointer;
-  transition: all 0.15s;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.tab-btn:hover { border-color: var(--brand); color: var(--brand); }
-.tab-btn.active {
-  border-color: var(--brand);
-  background: var(--brand-light);
-  color: var(--brand);
-  font-weight: 600;
-}
-.tab-hint {
-  margin-top: 10px;
-  font-size: 12px;
-  color: var(--muted);
-  padding: 8px 12px;
-  background: var(--bg);
-  border-radius: 6px;
-  line-height: 1.5;
-}
+.pf-card.x-card.on{border-color:#000;background:#000;box-shadow:0 6px 24px rgba(0,0,0,.3);}
+.pf-card.x-card::before{background:linear-gradient(135deg,#1a1a1a,#000);}
+.pf-card.x-card:hover{border-color:#333;}
 
-/* ===== PLATFORM TOGGLES ===== */
-.platform-row {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-}
-.platform-label-text {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  width: 100%;
-  margin-bottom: 4px;
-}
-.platform-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1.5px solid var(--border);
-  cursor: pointer;
-  transition: all 0.15s;
-  user-select: none;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--muted);
-}
-.platform-toggle.active-x { border-color: #000; background: #F0F0F0; color: #000; font-weight: 600; }
-.platform-toggle.active-meta { border-color: var(--meta-color); background: var(--meta-light); color: var(--meta-color); font-weight: 600; }
-.platform-toggle input { display: none; }
-.platform-icon { font-size: 15px; line-height: 1; }
+.pf-card.meta-card.on{border-color:#1877F2;background:linear-gradient(135deg,#1877F2,#166FE5);box-shadow:0 6px 24px rgba(24,119,242,.35);}
+.pf-card.meta-card:hover{border-color:#1877F2;}
 
-/* ===== TEXTAREA ===== */
-.input-area {
-  width: 100%;
-  min-height: 160px;
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  padding: 14px 16px;
-  font-size: 14px;
-  font-family: inherit;
-  line-height: 1.75;
-  resize: vertical;
-  transition: border-color 0.15s;
-  outline: none;
-  color: var(--text);
-  background: #FAFAFA;
-}
-.input-area:focus { border-color: var(--brand); background: white; }
-.input-area::placeholder { color: #C0C4CE; }
+.pf-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .18s;}
+.x-card .pf-icon{background:#111;}
+.x-card.on .pf-icon{background:rgba(255,255,255,.12);}
+.meta-card .pf-icon{background:#1877F2;}
+.meta-card.on .pf-icon{background:rgba(255,255,255,.2);}
 
-/* ===== CHECK BUTTON ===== */
-.check-btn {
-  width: 100%;
-  padding: 15px;
-  background: linear-gradient(135deg, #6C47FF 0%, #5B8DEF 100%);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  margin-top: 12px;
-  letter-spacing: 0.2px;
-  transition: transform 0.12s, box-shadow 0.12s;
-  box-shadow: 0 4px 14px rgba(108,71,255,0.35);
-}
-.check-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(108,71,255,0.4); }
-.check-btn:active { transform: translateY(0); }
+.pf-info{flex:1;}
+.pf-name{font-size:13px;font-weight:700;color:var(--text);transition:color .18s;}
+.pf-desc{font-size:11px;color:var(--sub);margin-top:2px;transition:color .18s;}
+.x-card.on .pf-name,.x-card.on .pf-desc{color:#fff;}
+.meta-card.on .pf-name,.meta-card.on .pf-desc{color:#fff;}
 
-/* ===== RESULT SECTIONS ===== */
-.result-card { display: none; }
+.pf-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .18s;flex-shrink:0;}
+.x-card.on .pf-check{background:#fff;border-color:#fff;color:#000;}
+.meta-card.on .pf-check{background:#fff;border-color:#fff;color:#1877F2;}
 
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.section-icon {
-  width: 32px; height: 32px;
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px;
-  flex-shrink: 0;
-}
-.icon-cr { background: var(--cr-light); }
-.icon-x { background: #F0F0F0; }
-.icon-meta { background: var(--meta-light); }
+/* ── INPUT ── */
+.inp{width:100%;min-height:160px;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;font-size:14px;font-family:inherit;line-height:1.8;resize:vertical;transition:border .15s;outline:none;color:var(--text);background:#FAFBFD;}
+.inp:focus{border-color:var(--brand);background:#fff;}
+.inp::placeholder{color:#C8CDD8;}
 
-.section-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text);
-}
-.section-sub {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 1px;
-}
+/* ── VIDEO INPUT ── */
+.video-inp{display:none;flex-direction:column;gap:12px;}
+.url-wrap{display:flex;gap:10px;}
+.url-field{flex:1;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:12px 16px;font-size:14px;font-family:inherit;outline:none;color:var(--text);background:#FAFBFD;transition:border .15s;}
+.url-field:focus{border-color:var(--brand);background:#fff;}
+.url-field::placeholder{color:#C8CDD8;}
+.fetch-btn{padding:12px 20px;background:linear-gradient(135deg,#6C47FF,#9B59B6);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s,transform .1s;}
+.fetch-btn:hover{opacity:.9;transform:translateY(-1px);}
+.fetch-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.yt-preview{display:none;border-radius:12px;overflow:hidden;background:#000;aspect-ratio:16/9;position:relative;}
+.yt-preview iframe{width:100%;height:100%;border:none;}
+.fetch-status{font-size:12px;padding:10px 14px;border-radius:8px;display:none;}
+.fetch-status.loading{background:#EEF2FF;color:#4338CA;}
+.fetch-status.ok{background:var(--ok-bg);color:var(--ok);}
+.fetch-status.ng{background:#FFF3CD;color:#92400E;}
+.transcript-area{display:none;}
+.transcript-area textarea{width:100%;min-height:120px;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;font-family:inherit;line-height:1.7;resize:vertical;outline:none;color:var(--text);background:#FAFBFD;}
+.transcript-area textarea:focus{border-color:var(--brand);}
+.transcript-label{font-size:12px;font-weight:600;color:var(--sub);margin-bottom:6px;}
 
-/* ===== VERDICT BADGE ===== */
-.verdict-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
-  margin-left: auto;
-  flex-shrink: 0;
-}
-.badge-pass { background: var(--ok-bg); color: var(--ok); border: 1px solid var(--ok-border); }
-.badge-fail { background: var(--fail-bg); color: var(--fail); border: 1px solid var(--fail-border); }
-.badge-warn { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-border); }
+/* ── BTN ── */
+.go-btn{width:100%;padding:15px;background:linear-gradient(135deg,#6C47FF 0%,#5B8DEF 100%);color:#fff;border:none;border-radius:var(--r-sm);font-size:15px;font-weight:800;cursor:pointer;margin-top:12px;letter-spacing:.2px;transition:transform .12s,box-shadow .12s;box-shadow:0 4px 14px rgba(108,71,255,.35);}
+.go-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(108,71,255,.45);}
+.go-btn:active{transform:translateY(0);}
 
-/* ===== VIOLATION ITEMS ===== */
-.violations-wrap { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+/* ── RESULT ── */
+.result{display:none;}
+.pass-all{text-align:center;padding:32px 24px;background:linear-gradient(135deg,var(--ok-bg),#D1FAE5);border-radius:14px;border:2px solid var(--ok-b);}
+.pass-all .e{font-size:48px;margin-bottom:12px;}
+.pass-all h3{font-size:20px;font-weight:800;color:var(--ok);}
+.pass-all p{font-size:13px;color:#065F46;margin-top:5px;}
 
-.v-item {
-  border-radius: 10px;
-  padding: 13px 15px;
-  border: 1px solid;
-}
-.v-item-cr { border-color: #DDD6FE; background: #FAF5FF; }
-.v-item-x { border-color: #D1D5DB; background: #F9FAFB; }
-.v-item-meta { border-color: #BFDBFE; background: #EFF6FF; }
+/* ── SECTION ── */
+.sec{margin-bottom:4px;}
+.sec-head{display:flex;align-items:center;gap:12px;padding:16px 0 14px;}
+.sec-logo{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo-cr{background:linear-gradient(135deg,#6C47FF,#9B59B6);}
+.logo-x{background:#000;}
+.logo-meta{background:linear-gradient(135deg,#1877F2,#0C52C4);}
+.sec-info{flex:1;}
+.sec-title{font-size:15px;font-weight:800;color:var(--text);}
+.sec-sub{font-size:11px;color:var(--sub);margin-top:2px;letter-spacing:.2px;}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:.3px;}
+.b-ok{background:var(--ok-bg);color:var(--ok);border:1.5px solid var(--ok-b);}
+.b-fail{background:var(--fail-bg);color:var(--fail);border:1.5px solid var(--fail-b);}
 
-.v-rule {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
-}
-.rule-cr { color: var(--cr-color); }
-.rule-x { color: #374151; }
-.rule-meta { color: var(--meta-color); }
+.vlist{display:flex;flex-direction:column;gap:10px;}
+.vitem{border-radius:12px;padding:14px 16px;border:1px solid;}
+.vi-cr{background:#FAF5FF;border-color:#DDD6FE;}
+.vi-x{background:#F8F9FA;border-color:#D1D5DB;}
+.vi-meta{background:#EFF6FF;border-color:#BFDBFE;}
 
-.v-rows { display: flex; flex-direction: column; gap: 6px; }
-.v-row { display: flex; gap: 10px; align-items: flex-start; }
-.v-lbl {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--muted);
-  min-width: 52px;
-  padding-top: 3px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  flex-shrink: 0;
-}
-.v-val { font-size: 13px; line-height: 1.55; color: var(--text); }
-.chip-bad { background: var(--fail-bg); color: var(--fail); padding: 1px 7px; border-radius: 5px; font-family: monospace; font-size: 12px; }
-.chip-good { background: var(--ok-bg); color: var(--ok); padding: 1px 7px; border-radius: 5px; font-family: monospace; font-size: 12px; }
+.vrule{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.vr-cr{color:#7C3AED;} .vr-x{color:#111;} .vr-meta{color:#1877F2;}
+.vtag{padding:2px 8px;border-radius:5px;font-size:10px;}
+.vtag-cr{background:#EDE9FE;color:#6D28D9;}
+.vtag-x{background:#F3F4F6;color:#374151;}
+.vtag-meta{background:#DBEAFE;color:#1E40AF;}
 
-/* ===== FIXED TEXT ===== */
-.fixed-box {
-  background: #FAFAFA;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 16px;
-  font-size: 13px;
-  line-height: 1.9;
-  white-space: pre-wrap;
-  word-break: break-word;
-  color: var(--text);
-  position: relative;
-  margin-top: 14px;
-}
-.copy-btn {
-  position: absolute;
-  top: 10px; right: 10px;
-  background: var(--brand);
-  color: white;
-  border: none;
-  border-radius: 7px;
-  padding: 5px 12px;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  letter-spacing: 0.3px;
-}
-.copy-btn:hover { opacity: 0.85; }
+.vrows{display:flex;flex-direction:column;gap:7px;}
+.vrow{display:flex;gap:10px;align-items:flex-start;}
+.vlbl{font-size:10px;font-weight:700;color:#94A3B8;min-width:54px;padding-top:3px;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0;}
+.vval{font-size:13px;line-height:1.6;color:var(--text);}
+.chip-bad{background:var(--fail-bg);color:var(--fail);padding:2px 8px;border-radius:5px;font-family:monospace;font-size:12px;}
+.chip-good{background:var(--ok-bg);color:var(--ok);padding:2px 8px;border-radius:5px;font-family:monospace;font-size:12px;}
 
-/* ===== NOTE BOX ===== */
-.note-box {
-  margin-top: 12px;
-  padding: 13px 15px;
-  border-radius: 10px;
-  font-size: 13px;
-  line-height: 1.7;
-}
-.note-cr { background: var(--cr-light); color: #4C1D95; border: 1px solid #DDD6FE; }
-.note-ok { background: var(--ok-bg); color: #14532D; border: 1px solid var(--ok-border); }
-.note-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+.ok-msg{font-size:13px;color:var(--ok);padding:10px 14px;background:var(--ok-bg);border-radius:8px;display:flex;align-items:center;gap:6px;}
 
-/* ===== DIVIDER ===== */
-hr { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+.fixed-wrap{margin-top:14px;}
+.fixed-lbl{font-size:10px;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;}
+.fixed-box{background:#F8FAFC;border:1px solid var(--border);border-radius:10px;padding:16px;font-size:13px;line-height:1.9;white-space:pre-wrap;word-break:break-word;color:var(--text);position:relative;}
+.copy-btn{position:absolute;top:10px;right:10px;background:var(--brand);color:#fff;border:none;border-radius:7px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;}
+.copy-btn:hover{opacity:.85;}
 
-/* ===== PASS ALL ===== */
-.pass-all {
-  text-align: center;
-  padding: 24px;
-  background: var(--ok-bg);
-  border-radius: 12px;
-  border: 2px solid var(--ok-border);
-}
-.pass-all .emoji { font-size: 40px; margin-bottom: 10px; }
-.pass-all h3 { font-size: 18px; font-weight: 800; color: var(--ok); }
-.pass-all p { font-size: 13px; color: #16a34a; margin-top: 4px; }
+.note{margin-top:12px;padding:12px 15px;border-radius:10px;font-size:13px;line-height:1.7;}
+.note-cr{background:#FAF5FF;color:#4C1D95;border:1px solid #DDD6FE;}
+.note-ok{background:var(--ok-bg);color:#065F46;border:1px solid var(--ok-b);}
+.nt{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;opacity:.7;}
+hr{border:none;border-top:1px solid var(--border);margin:20px 0;}
+
+/* SVGs */
+.ico-x svg,.ico-meta svg,.ico-cr svg{width:20px;height:20px;display:block;}
 </style>
 </head>
 <body>
 
-<div class="app-header">
-  <div class="header-inner">
-    <div class="header-tag">お絵かきクリエイターズ</div>
+<div class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-eyebrow">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      お絵かきクリエイターズ
+    </div>
     <h1>レギュレーションチェッカー</h1>
-    <p>商標 ・ X（Twitter）・ Meta の規約を一括チェック</p>
+    <p>商標 &nbsp;·&nbsp; X（Twitter）&nbsp;·&nbsp; Meta の規約を一括チェック</p>
   </div>
 </div>
 
 <div class="main">
 
-  <!-- 設定カード -->
+  <!-- 設定 -->
   <div class="card">
-    <div class="card-label">媒体を選択</div>
-    <div class="tab-group" id="mediaTabs">
-      <button class="tab-btn active" data-media="banner">📌 バナー・キャッチコピー</button>
-      <button class="tab-btn" data-media="video">🎬 動画・台本・テロップ</button>
-      <button class="tab-btn" data-media="lp">📄 HP・LP・チラシ</button>
+    <div class="clabel">媒体を選択</div>
+    <div class="tabs" id="tabs">
+      <button class="tab on" data-m="banner">📌 バナー・キャッチコピー</button>
+      <button class="tab" data-m="video">🎬 動画・台本・テロップ</button>
+      <button class="tab" data-m="lp">📄 HP・LP・チラシ</button>
     </div>
-    <div class="tab-hint" id="mediaHint">フル表記パターン：すべての箇所に® が必要</div>
+    <div class="hint" id="hint">フル表記パターン：すべての箇所に® が必要</div>
 
-    <div class="platform-row">
-      <div class="platform-label-text">プラットフォーム規約チェック（任意・複数選択可）</div>
-      <label class="platform-toggle" id="toggleX">
-        <input type="checkbox" id="checkX">
-        <span class="platform-icon">✖</span> X（Twitter）
-      </label>
-      <label class="platform-toggle" id="toggleMeta">
-        <input type="checkbox" id="checkMeta">
-        <span class="platform-icon">𝐟</span> Meta（Facebook / Instagram）
-      </label>
+    <div class="pf-row">
+      <div class="pf-label">プラットフォーム規約チェック（任意・複数選択可）</div>
+
+      <div class="pf-card x-card" id="pfX" onclick="togglePF('x')">
+        <div class="pf-icon ico-x">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.63L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
+        </div>
+        <div class="pf-info">
+          <div class="pf-name">X（Twitter）</div>
+          <div class="pf-desc">広告ポリシーチェック</div>
+        </div>
+        <div class="pf-check" id="ckX"></div>
+      </div>
+
+      <div class="pf-card meta-card" id="pfMeta" onclick="togglePF('meta')">
+        <div class="pf-icon ico-meta">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </div>
+        <div class="pf-info">
+          <div class="pf-name">Meta（Facebook / Instagram）</div>
+          <div class="pf-desc">広告ポリシーチェック</div>
+        </div>
+        <div class="pf-check" id="ckMeta"></div>
+      </div>
     </div>
   </div>
 
-  <!-- 入力カード -->
+  <!-- 入力 -->
   <div class="card">
-    <div class="card-label" id="inputLabel">チェックしたいテキストを貼り付け</div>
-    <textarea class="input-area" id="inputText" placeholder="ここにテキストを貼り付けてください...
+    <div class="clabel" id="inputLabel">チェックしたいテキストを貼り付け</div>
+
+    <!-- テキスト入力 -->
+    <div id="textArea">
+      <textarea class="inp" id="inputText" placeholder="ここにテキストを貼り付けてください...
 
 例：
 セールスいらずのお絵かきムービーで、
 認定お絵かきクリエイターになれるプログラムです。
 月収30万円も夢じゃない！誰でも簡単に稼げます。"></textarea>
-    <button class="check-btn" onclick="runCheck()">チェックする　→</button>
+    </div>
+
+    <!-- 動画URL入力 -->
+    <div id="videoArea" class="video-inp">
+      <div class="url-wrap">
+        <input class="url-field" id="ytUrl" type="url" placeholder="YouTube の URL を貼り付け（例：https://www.youtube.com/watch?v=...）">
+        <button class="fetch-btn" id="fetchBtn" onclick="fetchTranscript()">字幕を取得</button>
+      </div>
+      <div id="ytPreview" class="yt-preview"></div>
+      <div id="fetchStatus" class="fetch-status"></div>
+      <div id="transcriptArea" class="transcript-area">
+        <div class="transcript-label" id="transcriptLabel"></div>
+        <textarea id="transcriptText" placeholder="字幕テキストをここに貼り付けてください..."></textarea>
+      </div>
+    </div>
+
+    <button class="go-btn" onclick="runCheck()">チェックする　→</button>
   </div>
 
-  <!-- 結果カード -->
-  <div class="card result-card" id="resultCard">
+  <!-- 結果 -->
+  <div class="card result" id="result">
     <div id="resultInner"></div>
   </div>
 
 </div>
 
 <script>
-let currentMedia = 'banner';
+/* ─── Config ─── */
+let media = 'banner';
+let pfX = false, pfMeta = false;
 
-const MEDIA_CONFIG = {
-  banner: {
-    pattern: 'full',
-    hint: 'フル表記パターン：すべての箇所に® が必要',
-    requiresDeclaration: false,
-    placeholder: 'バナーやキャッチコピーのテキストを入力...'
-  },
-  video: {
-    pattern: 'hybrid',
-    hint: 'ハイブリッドパターン：冒頭だけ® 付き・中身はカギカッコのみ・末尾に権利宣言文が必要',
-    requiresDeclaration: true,
-    placeholder: '動画の台本またはテロップのテキストを入力...'
-  },
-  lp: {
-    pattern: 'hybrid',
-    hint: 'ハイブリッドパターン：冒頭だけ® 付き・中身はカギカッコのみ・末尾に権利宣言文が必要',
-    requiresDeclaration: true,
-    placeholder: 'LP・チラシのテキストを入力...'
-  }
+const MCFG = {
+  banner:{ pattern:'full',  hint:'フル表記パターン：すべての箇所に® が必要', decl:false },
+  video: { pattern:'hybrid',hint:'ハイブリッドパターン：冒頭だけ® 付き・中身はカギカッコのみ・末尾に権利宣言文が必要', decl:true },
+  lp:    { pattern:'hybrid',hint:'ハイブリッドパターン：冒頭だけ® 付き・中身はカギカッコのみ・末尾に権利宣言文が必要', decl:true }
 };
 
-const DECLARATION_TEXT = '※「お絵かきムービー」「お絵かきクリエイター」は株式会社アクアフィールドの登録商標です。';
+const DECL = '※「お絵かきムービー」「お絵かきクリエイター」は株式会社アクアフィールドの登録商標です。';
 
-// ===== X規約チェックルール =====
-const X_RULES = [
-  {
-    id: 'x_income_specific',
-    rule: '具体的な収入保証',
-    pattern: /月[収入]?\s*[0-9０-９]+\s*万[円]|年[収入]?\s*[0-9０-９]+\s*万[円]|[0-9０-９]+\s*万[円]\s*(?:稼|儲|収入|達成|突破)/g,
-    desc: '具体的な収入金額を保証・約束するような表現はNGです。',
-    fix: '「収入アップを目指せる」など可能性を示す表現に変更してください。'
-  },
-  {
-    id: 'x_guarantee',
-    rule: '成果・成功の保証表現',
-    pattern: /(?:必ず|絶対に?|確実に?)\s*(?:稼|儲|成功|収入|売れ|売上)/g,
-    desc: '「必ず」「絶対」など100%の成功を保証する表現はNGです。',
-    fix: '「目指せる」「可能性がある」などの表現に変更してください。'
-  },
-  {
-    id: 'x_easy_money',
-    rule: '「誰でも簡単に稼げる」系表現',
-    pattern: /誰[でもとが]\s*(?:簡単に?|すぐに?|楽に?)\s*(?:稼|儲|収入|お金)/g,
-    desc: '「誰でも簡単に稼げる」という誇大な表現はXの広告ポリシー違反になる可能性があります。',
-    fix: '「初心者でも取り組みやすい」など、具体的な特徴を示す表現にしてください。'
-  },
-  {
-    id: 'x_no_skill',
-    rule: '「スキル不要で稼げる」系表現',
-    pattern: /(?:スキル|経験|知識)\s*(?:なし|不要|ゼロ|０)\s*で\s*(?:稼|儲|収入|お金)/g,
-    desc: 'スキル・経験不要で収入が得られるという誇大な表現はNGです。',
-    fix: '「未経験から始められる」など、サポート体制を示す表現にしてください。'
-  },
-  {
-    id: 'x_clickbait',
-    rule: '扇情的・誇大なキャッチコピー',
-    pattern: /(?:衝撃|驚異|奇跡|禁断|極秘|裏技)の(?:方法|稼ぎ方|ノウハウ|テクニック)/g,
-    desc: '「衝撃の方法」「禁断の稼ぎ方」など扇情的な表現はNGです。',
-    fix: 'サービスの具体的な特徴や価値を正直に伝える表現にしてください。'
+/* ─── Media tabs ─── */
+document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  b.classList.add('on');
+  media = b.dataset.m;
+  document.getElementById('hint').textContent = MCFG[media].hint;
+  const isVideo = media === 'video';
+  document.getElementById('textArea').style.display = isVideo ? 'none' : 'block';
+  document.getElementById('videoArea').style.display = isVideo ? 'flex' : 'none';
+  document.getElementById('inputLabel').textContent = isVideo ? '動画URLを入力' : 'チェックしたいテキストを貼り付け';
+}));
+
+/* ─── Platform toggles ─── */
+function togglePF(p) {
+  if (p === 'x') {
+    pfX = !pfX;
+    document.getElementById('pfX').classList.toggle('on', pfX);
+    document.getElementById('ckX').textContent = pfX ? '✓' : '';
+  } else {
+    pfMeta = !pfMeta;
+    document.getElementById('pfMeta').classList.toggle('on', pfMeta);
+    document.getElementById('ckMeta').textContent = pfMeta ? '✓' : '';
   }
-];
+}
 
-// ===== Meta規約チェックルール =====
-const META_RULES = [
-  {
-    id: 'meta_personal_attr',
-    rule: '個人属性への直接言及',
-    pattern: /(?:収入|お金|給料)\s*が\s*(?:少ない|足りない|ない|低い)\s*(?:方|人|あなた|方々)|(?:副業|在宅ワーク|在宅勤務)\s*を\s*(?:探して|お探し|したい)\s*(?:いる|の)?\s*(?:方|人|あなた)/g,
-    desc: 'ターゲットの個人的な財務状況・状態を直接言及するのはMeta広告ポリシー違反です。',
-    fix: '「副業に興味がある方」など中立的な表現にしてください。'
-  },
-  {
-    id: 'meta_income_claim',
-    rule: '収入の保証・約束',
-    pattern: /月[収入]?\s*[0-9０-９]+\s*万[円]|年[収入]?\s*[0-9０-９]+\s*万[円]|(?:必ず|絶対に?)\s*(?:稼|儲|収入)/g,
-    desc: '具体的な収入数字の保証はMeta広告ポリシー違反になります。',
-    fix: '「実績例」として個人の結果であることを明記するか、収入保証の表現を避けてください。'
-  },
-  {
-    id: 'meta_misleading',
-    rule: '誇大・誤解を招く主張',
-    pattern: /(?:日本|国内|業界)\s*(?:最大|最高|No\.?1|ナンバーワン|一位)/g,
-    desc: '「日本最大」「業界No.1」など証明できない最上級表現はNGです。',
-    fix: '根拠のある具体的な数字か、または表現を削除してください。'
-  },
-  {
-    id: 'meta_before_after',
-    rule: '極端なビフォーアフター表現',
-    pattern: /(?:[0-9０-９]+\s*万円?)?(?:から|→|⇒)\s*(?:月[収入]?\s*)?[0-9０-９]+\s*万[円]|(?:月収|年収)\s*[0-9０-９]+\s*倍/g,
-    desc: '「〇万円→〇〇万円」など極端な成果の変化を示す表現はMetaで制限される場合があります。',
-    fix: '個人の実績であることを明記し、「※個人の感想です。成果には個人差があります。」を追記してください。'
-  },
-  {
-    id: 'meta_sensational',
-    rule: 'センセーショナルな表現',
-    pattern: /(?:今だけ|今すぐ|残り[0-9０-９]+名|限定[0-9０-９]+名)\s*(?![\n。])/g,
-    desc: '「今だけ！」「残り○名！」など過度な緊急性・希少性を煽る表現はMeta審査で問題になる場合があります。',
-    fix: '事実に基づく期限・定員情報のみを記載し、扇情的な強調を控えてください。'
+/* ─── YouTube transcript ─── */
+function getYTId(url) {
+  const m = url.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+async function fetchTranscript() {
+  const url = document.getElementById('ytUrl').value.trim();
+  const vid = getYTId(url);
+  const btn = document.getElementById('fetchBtn');
+  const status = document.getElementById('fetchStatus');
+  const preview = document.getElementById('ytPreview');
+  const taArea = document.getElementById('transcriptArea');
+  const taLabel = document.getElementById('transcriptLabel');
+
+  if (!vid) {
+    setStatus('error', 'YouTube の URL を入力してください。');
+    return;
   }
-];
 
-// ===== Media tabs =====
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentMedia = btn.dataset.media;
-    document.getElementById('mediaHint').textContent = MEDIA_CONFIG[currentMedia].hint;
-  });
-});
+  // プレビュー表示
+  preview.style.display = 'block';
+  preview.innerHTML = `<iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen></iframe>`;
 
-// ===== Platform toggles =====
-document.getElementById('toggleX').addEventListener('click', function() {
-  const cb = document.getElementById('checkX');
-  cb.checked = !cb.checked;
-  this.classList.toggle('active-x', cb.checked);
-});
-document.getElementById('toggleMeta').addEventListener('click', function() {
-  const cb = document.getElementById('checkMeta');
-  cb.checked = !cb.checked;
-  this.classList.toggle('active-meta', cb.checked);
-});
+  btn.disabled = true;
+  btn.textContent = '取得中...';
+  setStatus('loading', '字幕データを取得中...');
+  taArea.style.display = 'none';
 
-// ===== Main Check =====
+  const transcript = await tryFetchTranscript(vid);
+
+  btn.disabled = false;
+  btn.textContent = '字幕を取得';
+
+  if (transcript && transcript.trim().length > 10) {
+    setStatus('ok', `✓ 字幕を取得しました（${transcript.length}文字）。そのままチェックできます。`);
+    document.getElementById('transcriptText').value = transcript;
+    taLabel.textContent = '取得した字幕テキスト（編集できます）';
+    taArea.style.display = 'block';
+  } else {
+    setStatus('ng', '⚠ 字幕の自動取得に失敗しました。下のテキストエリアに手動で台本・テロップを貼り付けてください。');
+    document.getElementById('transcriptText').value = '';
+    taLabel.textContent = '台本・テロップを手動で貼り付け';
+    taArea.style.display = 'block';
+  }
+}
+
+async function tryFetchTranscript(vid) {
+  const proxies = [
+    url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+  ];
+
+  for (const proxy of proxies) {
+    try {
+      const listUrl = proxy(`https://www.youtube.com/api/timedtext?type=list&v=${vid}`);
+      const listRes = await fetch(listUrl, { signal: AbortSignal.timeout(6000) });
+      if (!listRes.ok) continue;
+      const listXml = await listRes.text();
+      const doc = new DOMParser().parseFromString(listXml, 'text/xml');
+      const tracks = Array.from(doc.querySelectorAll('track'));
+      if (!tracks.length) continue;
+
+      const track = tracks.find(t => t.getAttribute('lang_code') === 'ja')
+                 || tracks.find(t => t.getAttribute('lang_code')?.startsWith('ja'))
+                 || tracks[0];
+      if (!track) continue;
+
+      const lang = track.getAttribute('lang_code');
+      const name = encodeURIComponent(track.getAttribute('name') || '');
+      const tUrl = proxy(`https://www.youtube.com/api/timedtext?lang=${lang}&name=${name}&v=${vid}&fmt=json3`);
+      const tRes = await fetch(tUrl, { signal: AbortSignal.timeout(8000) });
+      if (!tRes.ok) continue;
+
+      const data = await tRes.json();
+      if (!data.events) continue;
+
+      return data.events
+        .filter(e => e.segs)
+        .map(e => e.segs.map(s => s.utf8 || '').join(''))
+        .join('\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+    } catch(e) { continue; }
+  }
+  return null;
+}
+
+function setStatus(type, msg) {
+  const el = document.getElementById('fetchStatus');
+  el.className = `fetch-status ${type === 'loading' ? 'loading' : type === 'ok' ? 'ok' : 'ng'}`;
+  el.style.display = 'block';
+  el.textContent = msg;
+}
+
+/* ─── Main check ─── */
 function runCheck() {
-  const text = document.getElementById('inputText').value.trim();
-  if (!text) { alert('テキストを入力してください。'); return; }
+  let text;
+  if (media === 'video') {
+    text = document.getElementById('transcriptText').value.trim();
+    if (!text) { alert('字幕を取得するか、テキストを手動で入力してください。'); return; }
+  } else {
+    text = document.getElementById('inputText').value.trim();
+    if (!text) { alert('テキストを入力してください。'); return; }
+  }
 
-  const media = MEDIA_CONFIG[currentMedia];
-  const doX = document.getElementById('checkX').checked;
-  const doMeta = document.getElementById('checkMeta').checked;
+  const cfg = MCFG[media];
+  const crV = getCR(text, cfg);
+  const fixed = getFixed(text, cfg);
+  const xV  = pfX    ? getPF(text, X_RULES)    : null;
+  const metaV = pfMeta ? getPF(text, META_RULES) : null;
 
-  const crViolations = getCRViolations(text, media);
-  const fixed = getFixed(text, media);
-  const xViolations = doX ? getPlatformViolations(text, X_RULES) : null;
-  const metaViolations = doMeta ? getPlatformViolations(text, META_RULES) : null;
-
-  renderResult(text, crViolations, fixed, xViolations, metaViolations, media);
+  render(text, crV, fixed, xV, metaV, cfg);
 }
 
-// ===== CR (商標) チェック =====
-function getCRViolations(text, media) {
-  const violations = [];
-
-  // 漢字
-  [...text.matchAll(/お絵描き/g)].forEach(m => violations.push({
-    rule: '漢字表記NG', bad: m[0], good: 'お絵かき',
-    context: ctx(text, m.index, m[0].length),
-    desc: '「かき」はひらがなが正しい表記です。「描き」（漢字）はNGです。'
-  }));
-
-  // カタカナ
-  [...text.matchAll(/オエカキム[ーー－]ビ[ーー]/g)].forEach(m => violations.push({
-    rule: 'カタカナ表記NG', bad: m[0], good: '「お絵かきムービー®」',
-    context: ctx(text, m.index, m[0].length), desc: 'カタカナ表記はNGです。'
-  }));
-
-  // 略称
-  [...text.matchAll(/お絵ム[ーー]/g)].forEach(m => violations.push({
-    rule: '略称NG', bad: m[0], good: '「お絵かきムービー®」',
-    context: ctx(text, m.index, m[0].length), desc: '「お絵ムー」などの略称はNGです。正式名称を使ってください。'
-  }));
-
-  // 認定
-  [...text.matchAll(/認定お絵かきクリエイター/g)].forEach(m => violations.push({
-    rule: '「認定」使用NG', bad: m[0], good: '「お絵かきクリエイター®」',
-    context: ctx(text, m.index, m[0].length), desc: '「認定」という接頭語はNGです。'
-  }));
-
-  // カギカッコ・® チェック
-  checkTM(text, 'お絵かきムービー', media.pattern, violations);
-  checkTM(text, 'お絵かきクリエイター', media.pattern, violations);
-
-  // 重複排除
-  const seen = new Set();
-  return violations.filter(v => { const k = v.rule + v.bad; if (seen.has(k)) return false; seen.add(k); return true; });
+/* ─── CR check ─── */
+function getCR(text, cfg) {
+  const v = [];
+  [...text.matchAll(/お絵描き/g)].forEach(m => v.push({ rule:'漢字表記NG', bad:m[0], good:'お絵かき', ctx:c(text,m.index,m[0].length), desc:'「かき」はひらがなが正しい。「描き」（漢字）はNGです。' }));
+  [...text.matchAll(/オエカキム[ーー－]ビ[ーー]/g)].forEach(m => v.push({ rule:'カタカナ表記NG', bad:m[0], good:'「お絵かきムービー®」', ctx:c(text,m.index,m[0].length), desc:'カタカナ表記はNGです。' }));
+  [...text.matchAll(/お絵ム[ーー]/g)].forEach(m => v.push({ rule:'略称NG', bad:m[0], good:'「お絵かきムービー®」', ctx:c(text,m.index,m[0].length), desc:'略称はNGです。正式名称を使ってください。' }));
+  [...text.matchAll(/認定お絵かきクリエイター/g)].forEach(m => v.push({ rule:'「認定」使用NG', bad:m[0], good:'「お絵かきクリエイター®」', ctx:c(text,m.index,m[0].length), desc:'「認定」という接頭語はNGです。' }));
+  chkTM(text,'お絵かきムービー',cfg.pattern,v);
+  chkTM(text,'お絵かきクリエイター',cfg.pattern,v);
+  const seen=new Set(); return v.filter(x=>{ const k=x.rule+x.bad; if(seen.has(k))return false; seen.add(k); return true; });
 }
 
-function checkTM(text, name, pattern, violations) {
-  const re = new RegExp(name, 'g');
-  let m;
-  while ((m = re.exec(text)) !== null) {
-    const idx = m.index;
-    const len = m[0].length;
-    const hasBracket = text[idx - 1] === '「';
-    const hasReg = text[idx + len] === '®';
-    if (!hasBracket) {
-      violations.push({
-        rule: 'カギカッコなし', bad: text.substring(Math.max(0, idx-3), idx+len+3),
-        good: pattern === 'full' ? `「${name}®」` : `「${name}®」（冒頭）または「${name}」（中盤）`,
-        context: ctx(text, idx, len),
-        desc: `「${name}」は必ずカギカッコ（「」）で囲む必要があります。`
-      }); return;
+function chkTM(text,name,pattern,v) {
+  const re=new RegExp(name,'g'); let m;
+  while((m=re.exec(text))!==null){
+    const i=m.index,l=m[0].length;
+    if(text[i-1]!=='「'){
+      v.push({ rule:'カギカッコなし', bad:text.substring(Math.max(0,i-3),i+l+3), good:pattern==='full'?`「${name}®」`:`「${name}®」（冒頭）または「${name}」（中盤）`, ctx:c(text,i,l), desc:`「${name}」はカギカッコ（「」）で囲んでください。` }); return;
     }
-    if (pattern === 'full' && !hasReg) {
-      violations.push({
-        rule: '® マーク欠落', bad: `「${name}」`, good: `「${name}®」`,
-        context: ctx(text, idx-1, len+2),
-        desc: 'バナー・キャッチコピーはフル表記のため、すべての箇所に®が必要です。'
-      });
-    }
+    if(pattern==='full' && text[i+l]!=='®')
+      v.push({ rule:'® マーク欠落', bad:`「${name}」`, good:`「${name}®」`, ctx:c(text,i-1,l+2), desc:'バナー・キャッチコピーはすべての箇所に®が必要です。' });
   }
 }
 
-function getFixed(text, media) {
-  let fixed = text
-    .replace(/お絵描き/g, 'お絵かき')
-    .replace(/認定お絵かきクリエイター/g, '「お絵かきクリエイター®」');
-
-  const applyFix = (t, name, pattern) => {
-    const e = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    t = t.replace(new RegExp(`(?<!「)${e}(?![」®])`, 'g'), `「${name}®」`);
-    if (pattern === 'full') t = t.replace(new RegExp(`「${e}」(?!®)`, 'g'), `「${name}®」`);
+function getFixed(text,cfg){
+  let f=text.replace(/お絵描き/g,'お絵かき').replace(/認定お絵かきクリエイター/g,'「お絵かきクリエイター®」');
+  const af=(t,name,pat)=>{
+    const e=name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    t=t.replace(new RegExp(`(?<!「)${e}(?![」®])`,'g'),`「${name}®」`);
+    if(pat==='full') t=t.replace(new RegExp(`「${e}」(?!®)`,'g'),`「${name}®」`);
     return t;
   };
-  fixed = applyFix(fixed, 'お絵かきムービー', media.pattern);
-  fixed = applyFix(fixed, 'お絵かきクリエイター', media.pattern);
-  return fixed;
+  f=af(f,'お絵かきムービー',cfg.pattern);
+  f=af(f,'お絵かきクリエイター',cfg.pattern);
+  return f;
 }
 
-// ===== Platform チェック =====
-function getPlatformViolations(text, rules) {
-  const violations = [];
-  rules.forEach(rule => {
-    rule.pattern.lastIndex = 0;
-    const matches = [...text.matchAll(rule.pattern)];
-    if (matches.length > 0) {
-      violations.push({
-        rule: rule.rule,
-        context: ctx(text, matches[0].index, matches[0][0].length),
-        bad: matches[0][0],
-        desc: rule.desc,
-        fix: rule.fix
-      });
-    }
+/* ─── Platform rules ─── */
+const X_RULES=[
+  { rule:'具体的な収入保証', pat:/月[収入]?\s*[0-9０-９]+\s*万[円]|年[収入]?\s*[0-9０-９]+\s*万[円]/g, desc:'具体的な収入金額を保証・約束する表現はNGです。', fix:'「収入アップを目指せる」など可能性を示す表現に変更してください。' },
+  { rule:'成果・成功の保証', pat:/(?:必ず|絶対に?|確実に?)\s*(?:稼|儲|成功|収入|売れ)/g, desc:'「必ず」「絶対」など100%の保証表現はNGです。', fix:'「目指せる」「可能性がある」などに変更してください。' },
+  { rule:'「誰でも簡単に稼げる」系表現', pat:/誰[でもとが]\s*(?:簡単に?|すぐに?|楽に?)\s*(?:稼|儲|収入|お金)/g, desc:'誰でも簡単に稼げるという誇大表現はNGです。', fix:'「初心者でも取り組みやすい」など具体的な特徴を示してください。' },
+  { rule:'スキル不要で稼げる表現', pat:/(?:スキル|経験|知識)\s*(?:なし|不要|ゼロ|０)\s*で\s*(?:稼|儲|収入)/g, desc:'スキル・経験不要で収入が得られるという誇大表現はNGです。', fix:'「未経験から始められる」などサポート体制を示してください。' },
+  { rule:'扇情的・誇大キャッチコピー', pat:/(?:衝撃|驚異|奇跡|禁断|極秘|裏技)の(?:方法|稼ぎ方|ノウハウ)/g, desc:'「衝撃の方法」「禁断の稼ぎ方」など扇情的な表現はNGです。', fix:'サービスの具体的な特徴を正直に伝える表現にしてください。' }
+];
+
+const META_RULES=[
+  { rule:'個人属性への直接言及', pat:/(?:収入|お金|給料)\s*が\s*(?:少ない|足りない|ない|低い)\s*(?:方|人|あなた)|(?:副業|在宅)\s*を\s*(?:探して|お探し)\s*(?:いる|の)?\s*(?:方|人|あなた)/g, desc:'個人の財務状況・状態を直接言及するのはMeta広告ポリシー違反です。', fix:'「副業に興味がある方」など中立的な表現にしてください。' },
+  { rule:'収入の保証・約束', pat:/月[収入]?\s*[0-9０-９]+\s*万[円]|年[収入]?\s*[0-9０-９]+\s*万[円]|(?:必ず|絶対に?)\s*(?:稼|儲|収入)/g, desc:'具体的な収入数字の保証はMeta広告ポリシー違反になります。', fix:'「※個人の結果には差があります」を明記するか、収入保証表現を避けてください。' },
+  { rule:'証明できない最上級表現', pat:/(?:日本|国内|業界)\s*(?:最大|最高|No\.?1|ナンバーワン|一位)/g, desc:'「日本最大」「業界No.1」など証明できない最上級表現はNGです。', fix:'根拠のある具体的な数字か、表現を削除してください。' },
+  { rule:'極端なビフォーアフター', pat:/(?:[0-9０-９]+\s*万円?)?\s*(?:から|→|⇒)\s*(?:月[収入]?\s*)?[0-9０-９]+\s*万[円]|月収\s*[0-9０-９]+\s*倍/g, desc:'極端な成果の変化を示す表現はMetaで制限される場合があります。', fix:'個人の実績として明記し、「※成果には個人差があります」を追記してください。' },
+  { rule:'過度な緊急性・希少性の煽り', pat:/(?:今だけ|今すぐ|残り[0-9０-９]+名|限定[0-9０-９]+名)/g, desc:'「今だけ！」「残り○名！」など過度な煽り表現はMeta審査で問題になる場合があります。', fix:'事実に基づく期限・定員情報のみを記載し、強調表現を控えてください。' }
+];
+
+function getPF(text, rules) {
+  const v = [];
+  rules.forEach(r => {
+    r.pat.lastIndex = 0;
+    const ms = [...text.matchAll(r.pat)];
+    if (ms.length) v.push({ rule:r.rule, bad:ms[0][0], fix:r.fix, desc:r.desc, ctx:c(text,ms[0].index,ms[0][0].length) });
   });
-  return violations;
+  return v;
 }
 
-// ===== Render =====
-function renderResult(text, crV, fixed, xV, metaV, media) {
-  const rc = document.getElementById('resultCard');
+/* ─── Render ─── */
+function render(text, crV, fixed, xV, metaV, cfg) {
+  const rc = document.getElementById('result');
   rc.style.display = 'block';
-
-  const hasDeclaration = text.includes('株式会社アクアフィールドの登録商標') || text.includes('登録商標');
-  const allClear = crV.length === 0 && (xV === null || xV.length === 0) && (metaV === null || metaV.length === 0);
+  const hasDecl = text.includes('株式会社アクアフィールドの登録商標') || text.includes('登録商標');
+  const allOk = crV.length===0 && (xV===null||xV.length===0) && (metaV===null||metaV.length===0);
 
   let html = '';
 
-  if (allClear) {
-    html = `<div class="pass-all"><div class="emoji">✅</div><h3>すべての項目で合格！</h3><p>商標・プラットフォーム規約に違反は見つかりませんでした。</p></div>`;
-    if (media.requiresDeclaration && !hasDeclaration) {
-      html += noteBox('cr', '追加対応が必要', `以下の権利宣言文をフッター・末尾に追加してください。<br><br><strong>コピペ用：</strong><br>${esc(DECLARATION_TEXT)}`);
-    }
+  if (allOk) {
+    html += `<div class="pass-all"><div class="e">✅</div><h3>すべての項目で合格！</h3><p>商標・プラットフォーム規約に違反は見つかりませんでした。</p></div>`;
+    if (cfg.decl && !hasDecl) html += noteHtml('cr','権利宣言文を末尾に追加してください', `コピペ用：<br><br>${esc(DECL)}`);
   } else {
-    // CR セクション
-    html += sectionHTML({
-      icon: '®', iconClass: 'icon-cr',
-      title: '商標レギュレーション', sub: 'お絵かきクリエイターズ 社内規定',
-      violations: crV,
-      itemClass: 'v-item-cr', ruleClass: 'rule-cr',
-      passText: '商標表記に問題はありません。',
-      showFixed: crV.length > 0,
-      fixed: fixed
+    // CR
+    html += secHtml({
+      logoClass:'logo-cr',
+      logoSvg:`<svg viewBox="0 0 24 24" fill="white" width="20" height="20"><text x="12" y="17" text-anchor="middle" font-size="14" font-weight="900" font-family="serif">®</text></svg>`,
+      title:'商標レギュレーション', sub:'お絵かきクリエイターズ 社内規定',
+      violations:crV, iclass:'vi-cr', rclass:'vr-cr', tclass:'vtag-cr',
+      passText:'商標表記に問題はありません。',
+      fixed: crV.length ? fixed : null
     });
-
-    if (crV.length > 0 && media.requiresDeclaration) {
-      html += noteBox('cr',
-        hasDeclaration ? '権利宣言文 ✓ 含まれています' : '権利宣言文を追加してください',
-        hasDeclaration ? '権利宣言文が確認できました。' : `末尾に以下を追記してください：<br><br>${esc(DECLARATION_TEXT)}`
-      );
+    if (cfg.decl) {
+      html += hasDecl
+        ? noteHtml('ok','権利宣言文 ✓ 確認済み','権利宣言文が含まれています。')
+        : noteHtml('cr','権利宣言文を追加してください', `末尾に以下を追記：<br><br>${esc(DECL)}`);
     }
 
-    // X セクション
+    // X
     if (xV !== null) {
       html += '<hr>';
-      html += sectionHTML({
-        icon: '✖', iconClass: 'icon-x',
-        title: 'X（Twitter）広告ポリシー', sub: '収入表現・保証・誇大広告チェック',
-        violations: xV,
-        itemClass: 'v-item-x', ruleClass: 'rule-x',
-        passText: 'X広告ポリシーに問題は見つかりませんでした。',
-        showFixed: false
+      html += secHtml({
+        logoClass:'logo-x',
+        logoSvg:`<svg viewBox="0 0 24 24" fill="white" width="18" height="18"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.63L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>`,
+        title:'X（Twitter）広告ポリシー', sub:'収入表現・保証・誇大広告チェック',
+        violations:xV, iclass:'vi-x', rclass:'vr-x', tclass:'vtag-x',
+        passText:'X広告ポリシーに問題は見つかりませんでした。',
+        fixed: null
       });
     }
 
-    // Meta セクション
+    // Meta
     if (metaV !== null) {
       html += '<hr>';
-      html += sectionHTML({
-        icon: '𝐟', iconClass: 'icon-meta',
-        title: 'Meta（Facebook / Instagram）広告ポリシー', sub: '個人属性・誇大表現・収入表現チェック',
-        violations: metaV,
-        itemClass: 'v-item-meta', ruleClass: 'rule-meta',
-        passText: 'Meta広告ポリシーに問題は見つかりませんでした。',
-        showFixed: false
+      html += secHtml({
+        logoClass:'logo-meta',
+        logoSvg:`<svg viewBox="0 0 24 24" fill="white" width="18" height="18"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`,
+        title:'Meta（Facebook / Instagram）広告ポリシー', sub:'個人属性・誇大表現・収入表現チェック',
+        violations:metaV, iclass:'vi-meta', rclass:'vr-meta', tclass:'vtag-meta',
+        passText:'Meta広告ポリシーに問題は見つかりませんでした。',
+        fixed: null
       });
     }
   }
 
   document.getElementById('resultInner').innerHTML = html;
-  rc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  rc.scrollIntoView({ behavior:'smooth', block:'start' });
 }
 
-function sectionHTML({ icon, iconClass, title, sub, violations, itemClass, ruleClass, passText, showFixed, fixed }) {
+function secHtml({ logoClass, logoSvg, title, sub, violations, iclass, rclass, tclass, passText, fixed }) {
   const badge = violations.length === 0
-    ? `<span class="verdict-badge badge-pass">✓ 合格</span>`
-    : `<span class="verdict-badge badge-fail">⚠ ${violations.length}件の違反</span>`;
-
-  let html = `
-    <div class="section-header">
-      <div class="section-icon ${iconClass}">${icon}</div>
-      <div><div class="section-title">${esc(title)}</div><div class="section-sub">${esc(sub)}</div></div>
-      ${badge}
-    </div>`;
-
+    ? `<span class="badge b-ok">✓ 合格</span>`
+    : `<span class="badge b-fail">⚠ ${violations.length}件の違反</span>`;
+  let h = `<div class="sec"><div class="sec-head"><div class="sec-logo ${logoClass}">${logoSvg}</div><div class="sec-info"><div class="sec-title">${esc(title)}</div><div class="sec-sub">${esc(sub)}</div></div>${badge}</div>`;
   if (violations.length === 0) {
-    html += `<p style="font-size:13px;color:var(--ok);padding:8px 12px;background:var(--ok-bg);border-radius:8px;">✓ ${esc(passText)}</p>`;
+    h += `<div class="ok-msg"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>${esc(passText)}</div>`;
   } else {
-    html += `<div class="violations-wrap">`;
-    violations.forEach((v, i) => {
-      html += `
-        <div class="v-item ${itemClass}">
-          <div class="v-rule ${ruleClass}">違反 ${i+1}　${esc(v.rule)}</div>
-          <div class="v-rows">
-            <div class="v-row"><span class="v-lbl">該当箇所</span><span class="v-val"><span class="chip-bad">${esc(v.context)}</span></span></div>
-            <div class="v-row"><span class="v-lbl">説明</span><span class="v-val">${esc(v.desc)}</span></div>
-            <div class="v-row"><span class="v-lbl">修正案</span><span class="v-val"><span class="chip-good">${esc(v.fix || v.good || '')}</span></span></div>
-          </div>
-        </div>`;
+    h += `<div class="vlist">`;
+    violations.forEach((v,i) => {
+      h += `<div class="vitem ${iclass}">
+        <div class="vrule ${rclass}"><span class="vtag ${tclass}">違反 ${i+1}</span> ${esc(v.rule)}</div>
+        <div class="vrows">
+          <div class="vrow"><span class="vlbl">該当箇所</span><span class="vval"><span class="chip-bad">${esc(v.ctx)}</span></span></div>
+          <div class="vrow"><span class="vlbl">説明</span><span class="vval">${esc(v.desc)}</span></div>
+          <div class="vrow"><span class="vlbl">修正案</span><span class="vval"><span class="chip-good">${esc(v.fix||v.good||'')}</span></span></div>
+        </div>
+      </div>`;
     });
-    html += `</div>`;
-
-    if (showFixed && fixed) {
-      html += `<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:16px;margin-bottom:8px;">修正済み全文</div>
-        <div class="fixed-box">
-          <button class="copy-btn" onclick="copyFixed(this)">コピー</button>
-          <span class="fixed-content">${esc(fixed)}</span>
-        </div>`;
-    }
+    h += `</div>`;
+    if (fixed) h += `<div class="fixed-wrap"><div class="fixed-lbl">修正済み全文</div><div class="fixed-box"><button class="copy-btn" onclick="doCopy(this)">コピー</button><span>${esc(fixed)}</span></div></div>`;
   }
-  return html;
+  h += `</div>`;
+  return h;
 }
 
-function noteBox(type, title, body) {
-  return `<div class="note-box note-${type}" style="margin-top:12px"><div class="note-title">${esc(title)}</div>${body}</div>`;
+function noteHtml(type, title, body) {
+  return `<div class="note note-${type}"><div class="nt">${esc(title)}</div>${body}</div>`;
 }
 
-function ctx(text, idx, len) {
-  const s = Math.max(0, idx - 8), e = Math.min(text.length, idx + len + 8);
-  return (s > 0 ? '...' : '') + text.substring(s, e) + (e < text.length ? '...' : '');
-}
-
-function esc(str) {
-  return String(str)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-function copyFixed(btn) {
-  const content = btn.nextElementSibling.textContent;
-  navigator.clipboard.writeText(content).then(() => {
-    btn.textContent = '✓ コピー済み';
-    setTimeout(() => btn.textContent = 'コピー', 1800);
-  });
-}
+/* ─── Helpers ─── */
+function c(text,i,l){ const s=Math.max(0,i-8),e=Math.min(text.length,i+l+8); return (s>0?'…':'')+text.substring(s,e)+(e<text.length?'…':''); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function doCopy(btn){ navigator.clipboard.writeText(btn.nextElementSibling.textContent).then(()=>{ btn.textContent='✓ コピー済み'; setTimeout(()=>btn.textContent='コピー',1800); }); }
 </script>
 </body>
 </html>
