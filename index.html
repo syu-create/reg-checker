@@ -140,10 +140,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 
 /* ── HISTORY ── */
 .hist-empty{text-align:center;padding:32px 24px;color:var(--sub);font-size:13px;line-height:1.8;}
-.hist-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.hist-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .hist-clear{font-size:11px;color:#94A3B8;background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;}
 .hist-clear:hover{color:var(--fail);border-color:var(--fail);}
+.hist-filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.hf-tab{padding:5px 13px;border-radius:20px;border:1.5px solid var(--border);background:#fff;font-size:11px;font-weight:700;color:var(--sub);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;}
+.hf-tab:hover{border-color:var(--brand);color:var(--brand);}
+.hf-tab.on{background:var(--brand);border-color:var(--brand);color:#fff;}
+.hf-tab.on .hf-count{opacity:.75;}
+.hf-count{font-size:10px;opacity:.6;font-weight:600;}
 .hist-list{display:flex;flex-direction:column;gap:10px;}
+.hist-none{text-align:center;padding:20px;color:var(--sub);font-size:12px;}
 .hist-card{border-radius:14px;background:#fff;overflow:hidden;transition:box-shadow .15s;border:1.5px solid var(--border);}
 .hist-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.08);}
 .hist-card.hc-pass{border-left:4px solid var(--ok);}
@@ -152,7 +159,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .hist-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
 .hist-body{flex:1;min-width:0;}
 .hist-title-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;flex-wrap:wrap;}
-.hist-media-label{font-size:12px;font-weight:800;color:var(--text);}
+.hist-media-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:800;}
+.hmb-banner{background:#FEF3C7;color:#B45309;}
+.hmb-copy{background:#EDE9FE;color:#6D28D9;}
+.hmb-video{background:#FEE2E2;color:#B91C1C;}
+.hmb-script{background:#D1FAE5;color:#065F46;}
 .hist-pf-tag{font-size:10px;color:var(--sub);background:var(--bg);padding:2px 7px;border-radius:8px;font-weight:600;}
 .hist-preview{font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px;}
 .hist-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
@@ -411,6 +422,7 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0;}
       <div class="clabel" style="margin-bottom:0;">チェック履歴</div>
       <button class="hist-clear" onclick="clearHistory()">すべて削除</button>
     </div>
+    <div id="histFilterTabs" class="hist-filter-row"></div>
     <div id="histList"></div>
   </div>
 
@@ -974,6 +986,8 @@ function doCopyById(id, btn){ const el=document.getElementById(id); const txt=[.
 /* ─── History ─── */
 const MEDIA_LABELS = { banner:'🖼️ バナー', copy:'✍️ コピー', video:'🎬 動画', script:'📝 台本' };
 const MEDIA_COLORS = { banner:'#F59E0B', copy:'#6C47FF', video:'#EF4444', script:'#10B981' };
+const MEDIA_BADGE_CLASS = { banner:'hmb-banner', copy:'hmb-copy', video:'hmb-video', script:'hmb-script' };
+let histFilter = 'all';
 
 function saveHistory(text, crV, xV, metaV, fixed) {
   const totalViolations = crV.length + (xV ? xV.length : 0) + (metaV ? metaV.length : 0);
@@ -1021,10 +1035,16 @@ function deleteEntry(id, e) {
   renderHistory();
 }
 
+function filterHistory(type) {
+  histFilter = type;
+  renderHistory();
+}
+
 function renderHistory() {
   const hist = getHist();
   const card = document.getElementById('histCard');
   const list = document.getElementById('histList');
+  const filterTabs = document.getElementById('histFilterTabs');
 
   if (hist.length === 0) {
     card.style.display = 'none';
@@ -1032,9 +1052,33 @@ function renderHistory() {
   }
   card.style.display = 'block';
 
-  list.innerHTML = `<div class="hist-list">${hist.map(h => {
-    const color = MEDIA_COLORS[h.media] || '#6C47FF';
+  // フィルタータブ（媒体別カウント付き）
+  const counts = { all: hist.length };
+  ['banner','copy','video','script'].forEach(m => {
+    const n = hist.filter(h => h.media === m).length;
+    if (n > 0) counts[m] = n;
+  });
+  const tabDefs = [
+    { key:'all', label:'すべて' },
+    { key:'banner', label:'🖼️ バナー' },
+    { key:'copy', label:'✍️ コピー' },
+    { key:'video', label:'🎬 動画' },
+    { key:'script', label:'📝 台本' }
+  ];
+  filterTabs.innerHTML = tabDefs
+    .filter(t => t.key === 'all' || counts[t.key])
+    .map(t => `<button class="hf-tab${histFilter===t.key?' on':''}" onclick="filterHistory('${t.key}')">
+      ${t.label}<span class="hf-count">${counts[t.key]||0}</span>
+    </button>`).join('');
+
+  // フィルタリング
+  const filtered = histFilter === 'all' ? hist : hist.filter(h => h.media === histFilter);
+
+  list.innerHTML = `<div class="hist-list">${filtered.length === 0
+    ? `<div class="hist-none">この媒体の履歴はありません</div>`
+    : filtered.map(h => {
     const label = MEDIA_LABELS[h.media] || h.media;
+    const badgeClass = MEDIA_BADGE_CLASS[h.media] || '';
     const badge = h.passed
       ? `<span class="hist-badge hb-pass">✓ 合格</span>`
       : `<span class="hist-badge hb-fail">⚠ ${h.totalViolations}件の違反</span>`;
@@ -1131,10 +1175,9 @@ function renderHistory() {
 
     return `<div class="hist-card ${h.passed ? 'hc-pass' : 'hc-fail'}">
       <div class="hist-card-head">
-        <div class="hist-icon" style="background:${color}22;">${label.slice(0,2)}</div>
         <div class="hist-body">
           <div class="hist-title-row">
-            <span class="hist-media-label">${esc(label)}</span>
+            <span class="hist-media-badge ${badgeClass}">${esc(label)}</span>
             ${pfTags}
           </div>
           <div class="hist-preview">${esc(h.preview || '—')}</div>
@@ -1156,7 +1199,7 @@ function renderHistory() {
         ${detailHtml}
       </div>
     </div>`;
-  }).join('')}</div>`;
+  }).join('')}</div>`;  // filtered.map end
 }
 
 function toggleHistItem(id) {
