@@ -262,10 +262,6 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0;}
       </div>
       <div class="img-preview" id="imgPreview"><img id="imgPreviewSrc" src="" alt="プレビュー"></div>
       <div id="ocrStatus" class="ocr-status"></div>
-      <div id="ocrTextWrap" class="ocr-text-wrap">
-        <div class="ocr-text-label" id="ocrTextLabel">読み取ったテキスト（編集できます）</div>
-        <textarea id="ocrText" placeholder="画像からテキストが読み取られます..."></textarea>
-      </div>
     </div>
 
     <!-- テキスト入力 -->
@@ -310,12 +306,8 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0;}
       <!-- プレビュー -->
       <div class="vid-preview" id="vidPreview"></div>
 
-      <!-- ステータス＆字幕 -->
+      <!-- ステータス -->
       <div id="fetchStatus" class="fetch-status"></div>
-      <div id="transcriptArea" class="transcript-area">
-        <div class="transcript-label" id="transcriptLabel"></div>
-        <textarea id="transcriptText" placeholder="台本・テロップのテキストをここに貼り付けてください..."></textarea>
-      </div>
     </div>
 
     <button class="go-btn" onclick="runCheck()">チェックする　→</button>
@@ -405,11 +397,10 @@ function switchSrc(src) {
       : 'Google Drive の共有URL を貼り付け（例：https://drive.google.com/file/d/...）';
   }
   // リセット
+  currentVideoFile = null; storedTranscript = null;
   document.getElementById('vidPreview').style.display = 'none';
   document.getElementById('vidPreview').innerHTML = '';
   document.getElementById('fetchStatus').style.display = 'none';
-  document.getElementById('transcriptArea').style.display = 'none';
-  document.getElementById('transcriptText').value = '';
 }
 
 // ドラッグ＆ドロップ
@@ -420,12 +411,11 @@ dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over
 
 function handleVideoFile(file) {
   if (!file) return;
-  const url = URL.createObjectURL(file);
+  currentVideoFile = file;
   const preview = document.getElementById('vidPreview');
   preview.style.display = 'block';
-  preview.innerHTML = `<video src="${url}" controls></video>`;
-  setStatus('ng', '⚠ ファイルからは字幕を自動取得できません。下のテキストエリアに台本・テロップを貼り付けてください。');
-  showTranscriptManual();
+  preview.innerHTML = `<video src="${URL.createObjectURL(file)}" controls></video>`;
+  setFetchStatus('ok', '✓ 動画を読み込みました。「チェックする」を押すとテロップを自動解析します。');
 }
 
 /* ─── URL fetch (YouTube / Google Drive) ─── */
@@ -442,20 +432,20 @@ function getGDriveId(url) {
 async function fetchFromUrl() {
   const url = document.getElementById('videoUrl').value.trim();
   const btn = document.getElementById('fetchBtn');
-  if (!url) { setStatus('error', 'URLを入力してください。'); return; }
+  if (!url) { setFetchStatus('error', 'URLを入力してください。'); return; }
 
   if (currentSrc === 'youtube' || getYTId(url)) {
     await fetchYouTube(url, btn);
   } else if (currentSrc === 'gdrive' || url.includes('drive.google.com')) {
     fetchGDrive(url);
   } else {
-    setStatus('error', '対応しているURLを入力してください（YouTube または Google Drive）。');
+    setFetchStatus('error', '対応しているURLを入力してください（YouTube または Google Drive）。');
   }
 }
 
 async function fetchYouTube(url, btn) {
   const vid = getYTId(url);
-  if (!vid) { setStatus('error', 'YouTube の URL を正しく入力してください。'); return; }
+  if (!vid) { setFetchStatus('error', 'YouTube の URL を正しく入力してください。'); return; }
 
   const preview = document.getElementById('vidPreview');
   preview.style.display = 'block';
@@ -463,7 +453,7 @@ async function fetchYouTube(url, btn) {
 
   btn.disabled = true;
   btn.textContent = '取得中...';
-  setStatus('loading', '字幕データを取得中...');
+  setFetchStatus('loading', '字幕データを取得中...');
   document.getElementById('transcriptArea').style.display = 'none';
 
   const transcript = await tryFetchTranscript(vid);
@@ -471,31 +461,21 @@ async function fetchYouTube(url, btn) {
   btn.textContent = '読み込む';
 
   if (transcript && transcript.trim().length > 10) {
-    setStatus('ok', `✓ 字幕を取得しました（${transcript.length}文字）。そのままチェックできます。`);
-    document.getElementById('transcriptText').value = transcript;
-    document.getElementById('transcriptLabel').textContent = '取得した字幕テキスト（編集できます）';
-    document.getElementById('transcriptArea').style.display = 'block';
+    storedTranscript = transcript;
+    setFetchStatus('ok', `✓ 字幕を取得しました（${transcript.length}文字）。「チェックする」を押すと分析します。`);
   } else {
-    setStatus('ng', '⚠ 字幕の自動取得に失敗しました。下のテキストエリアに台本・テロップを手動で貼り付けてください。');
-    showTranscriptManual();
+    storedTranscript = null;
+    setFetchStatus('ng', '⚠ 字幕の自動取得に失敗しました。この動画は字幕が設定されていない可能性があります。');
   }
 }
 
 function fetchGDrive(url) {
   const id = getGDriveId(url);
-  if (!id) { setStatus('error', 'Google Drive の URL を正しく入力してください。共有リンクをそのまま貼り付けてください。'); return; }
-
+  if (!id) { setFetchStatus('ng', 'Google Drive の URL を正しく入力してください。共有リンクをそのまま貼り付けてください。'); return; }
   const preview = document.getElementById('vidPreview');
   preview.style.display = 'block';
   preview.innerHTML = `<iframe src="https://drive.google.com/file/d/${id}/preview" allowfullscreen></iframe>`;
-
-  setStatus('ng', '⚠ Google Drive からは字幕を自動取得できません。下のテキストエリアに台本・テロップを貼り付けてください。');
-  showTranscriptManual();
-}
-
-function showTranscriptManual() {
-  document.getElementById('transcriptLabel').textContent = '台本・テロップを手動で貼り付け';
-  document.getElementById('transcriptArea').style.display = 'block';
+  setFetchStatus('ng', '⚠ Google Drive動画は直接分析できません。動画をMP4でダウンロードして「MP4ファイル」タブからアップロードしてください。');
 }
 
 async function tryFetchTranscript(vid) {
@@ -539,95 +519,142 @@ async function tryFetchTranscript(vid) {
   return null;
 }
 
-function setStatus(type, msg) {
+function setFetchStatus(type, msg) {
   const el = document.getElementById('fetchStatus');
   el.className = `fetch-status ${type === 'loading' ? 'loading' : type === 'ok' ? 'ok' : 'ng'}`;
   el.style.display = 'block';
   el.textContent = msg;
 }
 
-/* ─── Banner OCR ─── */
+/* ─── State ─── */
+let currentBannerFile = null;
+let currentVideoFile  = null;
+let storedTranscript  = null; // YouTube transcript
+let tessWorker        = null;
+
+async function getTess() {
+  if (!tessWorker) {
+    tessWorker = await Tesseract.createWorker('jpn+eng', 1);
+  }
+  return tessWorker;
+}
+
+/* ─── Banner ─── */
 const imgDrop = document.getElementById('imgDrop');
 imgDrop.addEventListener('dragover', e => { e.preventDefault(); imgDrop.classList.add('over'); });
 imgDrop.addEventListener('dragleave', () => imgDrop.classList.remove('over'));
 imgDrop.addEventListener('drop', e => { e.preventDefault(); imgDrop.classList.remove('over'); const f = e.dataTransfer.files[0]; if (f && f.type.startsWith('image/')) handleBannerFile(f); });
-
-// Ctrl+V でクリップボードから貼り付け
 document.addEventListener('paste', e => {
   if (media !== 'banner') return;
-  const items = Array.from(e.clipboardData.items);
-  const imgItem = items.find(i => i.type.startsWith('image/'));
-  if (imgItem) handleBannerFile(imgItem.getAsFile());
+  const img = Array.from(e.clipboardData.items).find(i => i.type.startsWith('image/'));
+  if (img) handleBannerFile(img.getAsFile());
 });
 
 function handleBannerFile(file) {
   if (!file) return;
-  const url = URL.createObjectURL(file);
-  const preview = document.getElementById('imgPreview');
-  const previewImg = document.getElementById('imgPreviewSrc');
-  preview.style.display = 'block';
-  previewImg.src = url;
-  runOCR(file);
+  currentBannerFile = file;
+  document.getElementById('imgPreviewSrc').src = URL.createObjectURL(file);
+  document.getElementById('imgPreview').style.display = 'block';
+  setOcrStatus('ok', '✓ 画像を読み込みました。「チェックする」を押すと分析を開始します。');
 }
 
-async function runOCR(file) {
-  const statusEl = document.getElementById('ocrStatus');
-  const textWrap = document.getElementById('ocrTextWrap');
-  const textArea = document.getElementById('ocrText');
-  const label = document.getElementById('ocrTextLabel');
+async function ocrImage(file, onProgress) {
+  const worker = await getTess();
+  worker.setParameters({ logger: m => {
+    if (m.status === 'recognizing text') onProgress(Math.round(m.progress * 100));
+  }});
+  const { data: { text } } = await worker.recognize(file);
+  return text.replace(/\s{2,}/g, ' ').trim();
+}
 
-  statusEl.className = 'ocr-status loading';
-  statusEl.style.display = 'block';
-  statusEl.textContent = '画像からテキストを読み取り中... (初回は少し時間がかかります)';
-  textWrap.style.display = 'none';
+function setOcrStatus(type, msg) {
+  const el = document.getElementById('ocrStatus');
+  el.className = `ocr-status ${type === 'loading' ? 'loading' : type === 'ok' ? 'ok' : 'ng'}`;
+  el.style.display = 'block';
+  el.textContent = msg;
+}
 
-  try {
-    const worker = await Tesseract.createWorker('jpn+eng', 1, {
-      logger: m => {
-        if (m.status === 'recognizing text') {
-          const pct = Math.round(m.progress * 100);
-          statusEl.textContent = `読み取り中... ${pct}%`;
-        }
+/* ─── Video frame extraction + OCR ─── */
+async function extractFramesAndOCR(videoFile, onProgress) {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement('video');
+    video.muted = true;
+    video.src = URL.createObjectURL(videoFile);
+    video.load();
+
+    video.addEventListener('error', () => reject(new Error('動画の読み込みに失敗しました。')));
+    video.addEventListener('loadedmetadata', async () => {
+      const duration = video.duration;
+      const FRAME_COUNT = Math.min(10, Math.max(3, Math.floor(duration / 4)));
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const allTexts = [];
+      const worker = await getTess();
+
+      for (let i = 0; i < FRAME_COUNT; i++) {
+        const t = (duration / FRAME_COUNT) * i;
+        await new Promise(r => {
+          video.currentTime = t;
+          video.addEventListener('seeked', r, { once: true });
+        });
+        canvas.width  = Math.round(video.videoWidth  * 0.5);
+        canvas.height = Math.round(video.videoHeight * 0.5);
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.8));
+        const { data: { text } } = await worker.recognize(blob);
+        allTexts.push(text.trim());
+        onProgress(Math.round(((i + 1) / FRAME_COUNT) * 100));
       }
+      URL.revokeObjectURL(video.src);
+      resolve([...new Set(allTexts)].join('\n'));
     });
-    const { data: { text } } = await worker.recognize(file);
-    await worker.terminate();
-
-    const cleaned = text.replace(/\s{2,}/g, ' ').trim();
-    if (cleaned.length > 0) {
-      statusEl.className = 'ocr-status ok';
-      statusEl.textContent = `✓ テキストを読み取りました（${cleaned.length}文字）。内容を確認してチェックしてください。`;
-      label.textContent = '読み取ったテキスト（編集できます）';
-      textArea.value = cleaned;
-    } else {
-      statusEl.className = 'ocr-status ng';
-      statusEl.textContent = '⚠ テキストの読み取りに失敗しました。下のエリアに手動で入力してください。';
-      label.textContent = 'テキストを手動で入力';
-      textArea.value = '';
-    }
-    textWrap.style.display = 'block';
-  } catch(e) {
-    statusEl.className = 'ocr-status ng';
-    statusEl.textContent = '⚠ OCRエラーが発生しました。下のエリアに手動で入力してください。';
-    label.textContent = 'テキストを手動で入力';
-    textArea.value = '';
-    textWrap.style.display = 'block';
-  }
+  });
 }
 
-/* ─── Main check ─── */
-function runCheck() {
+/* ─── Main check (async) ─── */
+async function runCheck() {
+  const btn = document.querySelector('.go-btn');
   let text;
+
   if (media === 'banner') {
-    text = document.getElementById('ocrText').value.trim();
-    if (!text) { alert('バナー画像をアップロードするか、テキストを手動で入力してください。'); return; }
+    if (!currentBannerFile) { alert('バナー画像をアップロードしてください。'); return; }
+    btn.disabled = true; btn.textContent = 'OCR解析中...';
+    setOcrStatus('loading', '画像からテキストを読み取り中...');
+    try {
+      text = await ocrImage(currentBannerFile, p => setOcrStatus('loading', `テキスト読み取り中... ${p}%`));
+      setOcrStatus('ok', `✓ 分析完了（読み取り文字数：${text.length}文字）`);
+    } catch(e) {
+      setOcrStatus('ng', '⚠ OCRに失敗しました。');
+      btn.disabled = false; btn.textContent = 'チェックする　→';
+      return;
+    }
+    if (!text) { setOcrStatus('ng', '⚠ テキストを読み取れませんでした。画像を確認してください。'); btn.disabled = false; btn.textContent = 'チェックする　→'; return; }
+
   } else if (media === 'video') {
-    text = document.getElementById('transcriptText').value.trim();
-    if (!text) { alert('字幕を取得するか、テキストを手動で入力してください。'); return; }
+    if (currentSrc === 'youtube') {
+      text = storedTranscript;
+      if (!text) { alert('先に「読み込む」ボタンで字幕を取得してください。'); return; }
+    } else if (currentSrc === 'gdrive') {
+      alert('Google Drive動画の直接分析はできません。MP4でダウンロードして「MP4ファイル」タブからアップロードしてください。'); return;
+    } else if (currentSrc === 'file') {
+      if (!currentVideoFile) { alert('動画ファイルをアップロードしてください。'); return; }
+      btn.disabled = true; btn.textContent = 'テロップ解析中...';
+      setFetchStatus('loading', '動画からテロップを読み取り中...');
+      try {
+        text = await extractFramesAndOCR(currentVideoFile, p => setFetchStatus('loading', `フレーム解析中... ${p}%`));
+        setFetchStatus('ok', `✓ 分析完了`);
+      } catch(e) {
+        setFetchStatus('ng', '⚠ 動画の解析に失敗しました。');
+        btn.disabled = false; btn.textContent = 'チェックする　→'; return;
+      }
+      if (!text.trim()) { setFetchStatus('ng', '⚠ テロップが検出できませんでした。'); btn.disabled = false; btn.textContent = 'チェックする　→'; return; }
+    }
   } else {
     text = document.getElementById('inputText').value.trim();
     if (!text) { alert('テキストを入力してください。'); return; }
   }
+
+  btn.disabled = false; btn.textContent = 'チェックする　→';
 
   const cfg = MCFG[media];
   const crV = getCR(text, cfg);
