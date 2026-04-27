@@ -130,26 +130,64 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .ocr-text-label{font-size:12px;font-weight:600;color:var(--sub);margin-bottom:6px;}
 .ocr-text-wrap textarea{width:100%;min-height:120px;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;font-family:inherit;line-height:1.7;resize:vertical;outline:none;color:var(--text);background:#FAFBFD;}
 .ocr-text-wrap textarea:focus{border-color:var(--brand);}
+/* ── RESULT HEADER ── */
+.result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.result-header-left{display:flex;align-items:center;gap:10px;}
+.result-now-dot{width:8px;height:8px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 3px rgba(108,71,255,.2);}
+.result-now-label{font-size:13px;font-weight:800;color:var(--text);}
+.result-media-tag{font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;background:#F0EBFF;color:var(--brand);}
+.result-ts{font-size:11px;color:#94A3B8;}
+
 /* ── HISTORY ── */
-.hist-empty{text-align:center;padding:24px;color:var(--sub);font-size:13px;}
-.hist-list{display:flex;flex-direction:column;gap:8px;}
-.hist-item{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:12px;border:1px solid var(--border);background:#FAFBFD;cursor:pointer;transition:all .15s;position:relative;}
-.hist-item:hover{border-color:var(--brand);background:#F8F5FF;transform:translateY(-1px);box-shadow:0 4px 12px rgba(108,71,255,.1);}
-.hist-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.hist-empty{text-align:center;padding:32px 24px;color:var(--sub);font-size:13px;line-height:1.8;}
+.hist-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.hist-clear{font-size:11px;color:#94A3B8;background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;}
+.hist-clear:hover{color:var(--fail);border-color:var(--fail);}
+.hist-list{display:flex;flex-direction:column;gap:10px;}
+.hist-card{border-radius:14px;background:#fff;overflow:hidden;transition:box-shadow .15s;border:1.5px solid var(--border);}
+.hist-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.08);}
+.hist-card.hc-pass{border-left:4px solid var(--ok);}
+.hist-card.hc-fail{border-left:4px solid var(--fail);}
+.hist-card-head{padding:14px 16px;display:flex;align-items:center;gap:12px;}
+.hist-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
 .hist-body{flex:1;min-width:0;}
-.hist-title{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;margin-bottom:3px;}
-.hist-preview{font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.hist-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
-.hist-time{font-size:11px;color:#94A3B8;}
+.hist-title-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;flex-wrap:wrap;}
+.hist-media-label{font-size:12px;font-weight:800;color:var(--text);}
+.hist-pf-tag{font-size:10px;color:var(--sub);background:var(--bg);padding:2px 7px;border-radius:8px;font-weight:600;}
+.hist-preview{font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px;}
+.hist-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
 .hist-badge{font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;white-space:nowrap;}
 .hb-pass{background:var(--ok-bg);color:var(--ok);border:1.5px solid var(--ok-b);}
 .hb-fail{background:var(--fail-bg);color:var(--fail);border:1.5px solid var(--fail-b);}
-.hist-del{position:absolute;top:8px;right:8px;background:none;border:none;color:#CBD5E1;cursor:pointer;font-size:14px;padding:2px 5px;border-radius:4px;display:none;}
-.hist-item:hover .hist-del{display:block;}
-.hist-del:hover{color:var(--fail);background:var(--fail-bg);}
-.hist-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.hist-clear{font-size:11px;color:#94A3B8;background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;}
-.hist-clear:hover{color:var(--fail);border-color:var(--fail);}
+.hist-time{font-size:11px;color:#94A3B8;}
+.hist-actions{display:flex;align-items:center;gap:6px;margin-top:2px;}
+.hist-toggle-btn{font-size:11px;color:var(--brand);background:#F0EBFF;border:none;border-radius:8px;padding:4px 10px;cursor:pointer;font-weight:700;display:flex;align-items:center;gap:4px;white-space:nowrap;}
+.hist-toggle-btn:hover{background:#E8DFFF;}
+.hist-del-btn{background:none;border:none;color:#CBD5E1;cursor:pointer;font-size:12px;padding:4px 7px;border-radius:6px;font-weight:700;}
+.hist-del-btn:hover{color:var(--fail);background:var(--fail-bg);}
+.hist-detail{display:none;padding:0 16px 16px;border-top:1px solid var(--border);}
+.hist-detail.open{display:block;}
+.hist-vcount-row{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 12px;}
+.hist-vcount{font-size:11px;font-weight:700;padding:4px 12px;border-radius:10px;}
+.hvc-cr{background:#FAF5FF;color:#7C3AED;border:1px solid #DDD6FE;}
+.hvc-x{background:#F3F4F6;color:#374151;border:1px solid #D1D5DB;}
+.hvc-meta{background:#EFF6FF;color:#1877F2;border:1px solid #BFDBFE;}
+.hvc-ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-b);}
+.hist-section-lbl{font-size:10px;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:.8px;margin:12px 0 8px;display:flex;align-items:center;gap:8px;}
+.hist-section-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
+.hist-v-list{display:flex;flex-direction:column;gap:7px;}
+.hist-vitem{background:#F8FAFC;border-radius:10px;padding:10px 13px;border:1px solid var(--border);}
+.hist-vitem-cr{border-left:3px solid #7C3AED;}
+.hist-vitem-x{border-left:3px solid #374151;}
+.hist-vitem-meta{border-left:3px solid #1877F2;}
+.hist-vitem-rule{font-size:10px;font-weight:800;letter-spacing:.4px;margin-bottom:6px;text-transform:uppercase;}
+.hvr-cr{color:#7C3AED;} .hvr-x{color:#374151;} .hvr-meta{color:#1877F2;}
+.hist-vitem-rows{display:flex;flex-direction:column;gap:4px;}
+.hist-vitem-row{display:flex;gap:8px;align-items:flex-start;}
+.hist-vlbl{font-size:10px;font-weight:700;color:#94A3B8;min-width:44px;padding-top:2px;flex-shrink:0;}
+.hist-vval{font-size:12px;color:var(--text);line-height:1.5;}
+.h-ok-msg{font-size:12px;color:var(--ok);padding:8px 12px;background:var(--ok-bg);border-radius:8px;display:flex;align-items:center;gap:6px;margin-top:4px;}
+
 
 /* ── BTN ── */
 .go-btn{width:100%;padding:15px;background:linear-gradient(135deg,#6C47FF 0%,#5B8DEF 100%);color:#fff;border:none;border-radius:var(--r-sm);font-size:15px;font-weight:800;cursor:pointer;margin-top:12px;letter-spacing:.2px;transition:transform .12s,box-shadow .12s;box-shadow:0 4px 14px rgba(108,71,255,.35);}
@@ -807,7 +845,16 @@ function render(text, crV, fixed, xV, metaV, cfg) {
   const hasDecl = text.includes('株式会社アクアフィールドの登録商標') || text.includes('登録商標');
   const allOk = crV.length===0 && (xV===null||xV.length===0) && (metaV===null||metaV.length===0);
 
-  let html = '';
+  const nowTs = new Date().toLocaleString('ja-JP', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' });
+  const mediaLabel = { banner:'🖼️ バナー', copy:'✍️ コピー', video:'🎬 動画', script:'📝 台本' }[media] || media;
+  let html = `<div class="result-header">
+    <div class="result-header-left">
+      <div class="result-now-dot"></div>
+      <div class="result-now-label">今回のチェック結果</div>
+      <div class="result-media-tag">${mediaLabel}</div>
+    </div>
+    <div class="result-ts">${nowTs}</div>
+  </div>`;
 
   if (allOk) {
     html += `<div class="pass-all"><div class="e">✅</div><h3>すべての項目で合格！</h3><p>商標・プラットフォーム規約に違反は見つかりませんでした。</p></div>`;
@@ -902,7 +949,7 @@ function saveHistory(text, crV, xV, metaV) {
   const totalViolations = crV.length + (xV ? xV.length : 0) + (metaV ? metaV.length : 0);
   const passed = totalViolations === 0;
   const platforms = [xV !== null ? 'X' : null, metaV !== null ? 'Meta' : null].filter(Boolean);
-  const preview = text.replace(/\n/g, ' ').trim().slice(0, 60) + (text.length > 60 ? '…' : '');
+  const preview = text.replace(/\n/g, ' ').trim().slice(0, 80) + (text.length > 80 ? '…' : '');
   const entry = {
     id: Date.now(),
     media,
@@ -912,6 +959,9 @@ function saveHistory(text, crV, xV, metaV) {
     crCount: crV.length,
     xCount: xV ? xV.length : null,
     metaCount: metaV ? metaV.length : null,
+    crViolations: crV,
+    xViolations: xV || null,
+    metaViolations: metaV || null,
     platforms,
     ts: new Date().toLocaleString('ja-JP', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' })
   };
@@ -956,26 +1006,96 @@ function renderHistory() {
     const badge = h.passed
       ? `<span class="hist-badge hb-pass">✓ 合格</span>`
       : `<span class="hist-badge hb-fail">⚠ ${h.totalViolations}件の違反</span>`;
+    const pfTags = (h.platforms || []).map(p => `<span class="hist-pf-tag">${esc(p)}</span>`).join('');
 
-    const details = [];
-    if (h.crCount > 0) details.push(`商標${h.crCount}件`);
-    if (h.xCount) details.push(`X:${h.xCount}件`);
-    if (h.metaCount) details.push(`Meta:${h.metaCount}件`);
-    const detailStr = details.length ? ` (${details.join(' / ')})` : '';
+    // 違反詳細HTML
+    let detailHtml = '';
+    const crV = h.crViolations || [];
+    const xV = h.xViolations || [];
+    const metaV = h.metaViolations || [];
 
-    return `<div class="hist-item">
-      <div class="hist-icon" style="background:${color}22;">${label.slice(0,2)}</div>
-      <div class="hist-body">
-        <div class="hist-title">${esc(label)}${h.platforms.length ? '<span style="font-size:10px;color:#94A3B8;font-weight:500;">' + h.platforms.join(' · ') + '</span>' : ''}</div>
-        <div class="hist-preview">${esc(h.preview || '—')}</div>
+    // サマリーカウント行
+    let countHtml = '';
+    if (h.passed) {
+      countHtml = `<span class="hist-vcount hvc-ok">✓ すべての項目で合格</span>`;
+    } else {
+      if (crV.length > 0) countHtml += `<span class="hist-vcount hvc-cr">商標 ${crV.length}件の違反</span>`;
+      else if (h.crCount === 0 && crV !== undefined) countHtml += `<span class="hist-vcount hvc-ok">商標 合格</span>`;
+      if (h.xViolations !== undefined && h.xViolations !== null) {
+        if (xV.length > 0) countHtml += `<span class="hist-vcount hvc-x">X ${xV.length}件の違反</span>`;
+        else countHtml += `<span class="hist-vcount hvc-ok">X 合格</span>`;
+      }
+      if (h.metaViolations !== undefined && h.metaViolations !== null) {
+        if (metaV.length > 0) countHtml += `<span class="hist-vcount hvc-meta">Meta ${metaV.length}件の違反</span>`;
+        else countHtml += `<span class="hist-vcount hvc-ok">Meta 合格</span>`;
+      }
+    }
+
+    const renderVItems = (violations, iclass, rclass) => violations.map((v,i) =>
+      `<div class="hist-vitem ${iclass}">
+        <div class="hist-vitem-rule ${rclass}">違反${i+1} ${esc(v.rule)}</div>
+        <div class="hist-vitem-rows">
+          <div class="hist-vitem-row"><span class="hist-vlbl">該当箇所</span><span class="hist-vval"><span class="chip-bad">${esc(v.ctx||v.bad||'')}</span></span></div>
+          <div class="hist-vitem-row"><span class="hist-vlbl">説明</span><span class="hist-vval">${esc(v.desc||'')}</span></div>
+          <div class="hist-vitem-row"><span class="hist-vlbl">修正案</span><span class="hist-vval"><span class="chip-good">${esc(v.fix||v.good||'')}</span></span></div>
+        </div>
+      </div>`).join('');
+
+    let violHtml = '';
+    if (crV.length > 0) {
+      violHtml += `<div class="hist-section-lbl">商標レギュレーション</div><div class="hist-v-list">${renderVItems(crV,'hist-vitem-cr','hvr-cr')}</div>`;
+    } else if (crV.length === 0 && h.crViolations !== undefined) {
+      violHtml += `<div class="h-ok-msg"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>商標表記に問題はありません</div>`;
+    }
+    if (h.xViolations !== null && h.xViolations !== undefined) {
+      if (xV.length > 0) violHtml += `<div class="hist-section-lbl">X広告ポリシー</div><div class="hist-v-list">${renderVItems(xV,'hist-vitem-x','hvr-x')}</div>`;
+      else violHtml += `<div class="h-ok-msg"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>X広告ポリシーに問題は見つかりませんでした</div>`;
+    }
+    if (h.metaViolations !== null && h.metaViolations !== undefined) {
+      if (metaV.length > 0) violHtml += `<div class="hist-section-lbl">Meta広告ポリシー</div><div class="hist-v-list">${renderVItems(metaV,'hist-vitem-meta','hvr-meta')}</div>`;
+      else violHtml += `<div class="h-ok-msg"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Meta広告ポリシーに問題は見つかりませんでした</div>`;
+    }
+
+    detailHtml = `<div class="hist-vcount-row">${countHtml}</div>${violHtml}`;
+
+    return `<div class="hist-card ${h.passed ? 'hc-pass' : 'hc-fail'}">
+      <div class="hist-card-head">
+        <div class="hist-icon" style="background:${color}22;">${label.slice(0,2)}</div>
+        <div class="hist-body">
+          <div class="hist-title-row">
+            <span class="hist-media-label">${esc(label)}</span>
+            ${pfTags}
+          </div>
+          <div class="hist-preview">${esc(h.preview || '—')}</div>
+        </div>
+        <div class="hist-right">
+          ${badge}
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="hist-time">${esc(h.ts)}</span>
+          </div>
+          <div class="hist-actions">
+            <button class="hist-toggle-btn" id="ht-${h.id}" onclick="toggleHistItem(${h.id})">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 9l6 6 6-6"/></svg>詳細
+            </button>
+            <button class="hist-del-btn" onclick="deleteEntry(${h.id}, event)" title="削除">✕</button>
+          </div>
+        </div>
       </div>
-      <div class="hist-meta">
-        ${badge}
-        <span class="hist-time">${esc(h.ts)}${detailStr}</span>
+      <div class="hist-detail" id="hd-${h.id}">
+        ${detailHtml}
       </div>
-      <button class="hist-del" onclick="deleteEntry(${h.id}, event)" title="削除">✕</button>
     </div>`;
   }).join('')}</div>`;
+}
+
+function toggleHistItem(id) {
+  const detail = document.getElementById(`hd-${id}`);
+  const btn = document.getElementById(`ht-${id}`);
+  const isOpen = detail.classList.contains('open');
+  detail.classList.toggle('open', !isOpen);
+  btn.innerHTML = isOpen
+    ? `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 9l6 6 6-6"/></svg>詳細`
+    : `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 15l-6-6-6 6"/></svg>閉じる`;
 }
 
 // 起動時に履歴を読み込む
