@@ -187,6 +187,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .hist-vlbl{font-size:10px;font-weight:700;color:#94A3B8;min-width:44px;padding-top:2px;flex-shrink:0;}
 .hist-vval{font-size:12px;color:var(--text);line-height:1.5;}
 .h-ok-msg{font-size:12px;color:var(--ok);padding:8px 12px;background:var(--ok-bg);border-radius:8px;display:flex;align-items:center;gap:6px;margin-top:4px;}
+.hist-text-block{margin-top:14px;}
+.hist-text-lbl{font-size:10px;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;display:flex;align-items:center;gap:8px;}
+.hist-text-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
+.hist-text-box{background:#F8FAFC;border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.9;white-space:pre-wrap;word-break:break-word;color:var(--text);position:relative;max-height:200px;overflow-y:auto;}
+.hist-text-box.fixed-text{background:#F0FDF4;border-color:var(--ok-b);}
+.hist-copy-btn{position:absolute;top:8px;right:8px;background:var(--brand);color:#fff;border:none;border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;}
+.hist-copy-btn:hover{opacity:.85;}
 
 
 /* ── BTN ── */
@@ -730,7 +737,7 @@ async function runCheck() {
   const metaV = pfMeta ? getPF(text, META_RULES) : null;
 
   render(text, crV, fixed, xV, metaV, cfg);
-  saveHistory(text, crV, xV, metaV);
+  saveHistory(text, crV, xV, metaV, fixed);
 }
 
 /* ─── CR check ─── */
@@ -940,12 +947,13 @@ function noteHtml(type, title, body) {
 function c(text,i,l){ const s=Math.max(0,i-8),e=Math.min(text.length,i+l+8); return (s>0?'…':'')+text.substring(s,e)+(e<text.length?'…':''); }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function doCopy(btn){ navigator.clipboard.writeText(btn.nextElementSibling.textContent).then(()=>{ btn.textContent='✓ コピー済み'; setTimeout(()=>btn.textContent='コピー',1800); }); }
+function doCopyById(id, btn){ const el=document.getElementById(id); const txt=[...el.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join(''); navigator.clipboard.writeText(txt).then(()=>{ btn.textContent='✓ コピー済み'; setTimeout(()=>btn.textContent='コピー',1800); }); }
 
 /* ─── History ─── */
 const MEDIA_LABELS = { banner:'🖼️ バナー', copy:'✍️ コピー', video:'🎬 動画', script:'📝 台本' };
 const MEDIA_COLORS = { banner:'#F59E0B', copy:'#6C47FF', video:'#EF4444', script:'#10B981' };
 
-function saveHistory(text, crV, xV, metaV) {
+function saveHistory(text, crV, xV, metaV, fixed) {
   const totalViolations = crV.length + (xV ? xV.length : 0) + (metaV ? metaV.length : 0);
   const passed = totalViolations === 0;
   const platforms = [xV !== null ? 'X' : null, metaV !== null ? 'Meta' : null].filter(Boolean);
@@ -954,6 +962,8 @@ function saveHistory(text, crV, xV, metaV) {
     id: Date.now(),
     media,
     preview,
+    fullText: text,
+    fixedText: (crV.length > 0 && fixed && fixed !== text) ? fixed : null,
     passed,
     totalViolations,
     crCount: crV.length,
@@ -1056,7 +1066,19 @@ function renderHistory() {
       else violHtml += `<div class="h-ok-msg"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Meta広告ポリシーに問題は見つかりませんでした</div>`;
     }
 
-    detailHtml = `<div class="hist-vcount-row">${countHtml}</div>${violHtml}`;
+    // チェック本文 & 修正済み全文
+    const fullTextHtml = h.fullText
+      ? `<div class="hist-text-block">
+          <div class="hist-text-lbl">チェックしたテキスト</div>
+          <div class="hist-text-box" id="htxt-${h.id}">${esc(h.fullText)}<button class="hist-copy-btn" onclick="doCopyById('htxt-${h.id}',this)">コピー</button></div>
+        </div>` : '';
+    const fixedTextHtml = h.fixedText
+      ? `<div class="hist-text-block">
+          <div class="hist-text-lbl">修正済み全文</div>
+          <div class="hist-text-box fixed-text" id="hfix-${h.id}">${esc(h.fixedText)}<button class="hist-copy-btn" onclick="doCopyById('hfix-${h.id}',this)">コピー</button></div>
+        </div>` : '';
+
+    detailHtml = `<div class="hist-vcount-row">${countHtml}</div>${violHtml}${fullTextHtml}${fixedTextHtml}`;
 
     return `<div class="hist-card ${h.passed ? 'hc-pass' : 'hc-fail'}">
       <div class="hist-card-head">
