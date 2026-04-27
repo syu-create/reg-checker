@@ -130,6 +130,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .ocr-text-label{font-size:12px;font-weight:600;color:var(--sub);margin-bottom:6px;}
 .ocr-text-wrap textarea{width:100%;min-height:120px;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;font-family:inherit;line-height:1.7;resize:vertical;outline:none;color:var(--text);background:#FAFBFD;}
 .ocr-text-wrap textarea:focus{border-color:var(--brand);}
+/* ── HISTORY ── */
+.hist-empty{text-align:center;padding:24px;color:var(--sub);font-size:13px;}
+.hist-list{display:flex;flex-direction:column;gap:8px;}
+.hist-item{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:12px;border:1px solid var(--border);background:#FAFBFD;cursor:pointer;transition:all .15s;position:relative;}
+.hist-item:hover{border-color:var(--brand);background:#F8F5FF;transform:translateY(-1px);box-shadow:0 4px 12px rgba(108,71,255,.1);}
+.hist-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.hist-body{flex:1;min-width:0;}
+.hist-title{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;margin-bottom:3px;}
+.hist-preview{font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hist-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.hist-time{font-size:11px;color:#94A3B8;}
+.hist-badge{font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;white-space:nowrap;}
+.hb-pass{background:var(--ok-bg);color:var(--ok);border:1.5px solid var(--ok-b);}
+.hb-fail{background:var(--fail-bg);color:var(--fail);border:1.5px solid var(--fail-b);}
+.hist-del{position:absolute;top:8px;right:8px;background:none;border:none;color:#CBD5E1;cursor:pointer;font-size:14px;padding:2px 5px;border-radius:4px;display:none;}
+.hist-item:hover .hist-del{display:block;}
+.hist-del:hover{color:var(--fail);background:var(--fail-bg);}
+.hist-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.hist-clear{font-size:11px;color:#94A3B8;background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;}
+.hist-clear:hover{color:var(--fail);border-color:var(--fail);}
 
 /* ── BTN ── */
 .go-btn{width:100%;padding:15px;background:linear-gradient(135deg,#6C47FF 0%,#5B8DEF 100%);color:#fff;border:none;border-radius:var(--r-sm);font-size:15px;font-weight:800;cursor:pointer;margin-top:12px;letter-spacing:.2px;transition:transform .12s,box-shadow .12s;box-shadow:0 4px 14px rgba(108,71,255,.35);}
@@ -316,6 +336,15 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0;}
   <!-- 結果 -->
   <div class="card result" id="result">
     <div id="resultInner"></div>
+  </div>
+
+  <!-- チェック履歴 -->
+  <div class="card" id="histCard" style="display:none;">
+    <div class="hist-header">
+      <div class="clabel" style="margin-bottom:0;">チェック履歴</div>
+      <button class="hist-clear" onclick="clearHistory()">すべて削除</button>
+    </div>
+    <div id="histList"></div>
   </div>
 
 </div>
@@ -663,6 +692,7 @@ async function runCheck() {
   const metaV = pfMeta ? getPF(text, META_RULES) : null;
 
   render(text, crV, fixed, xV, metaV, cfg);
+  saveHistory(text, crV, xV, metaV);
 }
 
 /* ─── CR check ─── */
@@ -822,6 +852,93 @@ function noteHtml(type, title, body) {
 function c(text,i,l){ const s=Math.max(0,i-8),e=Math.min(text.length,i+l+8); return (s>0?'…':'')+text.substring(s,e)+(e<text.length?'…':''); }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function doCopy(btn){ navigator.clipboard.writeText(btn.nextElementSibling.textContent).then(()=>{ btn.textContent='✓ コピー済み'; setTimeout(()=>btn.textContent='コピー',1800); }); }
+
+/* ─── History ─── */
+const MEDIA_LABELS = { banner:'🖼️ バナー', copy:'✍️ コピー', video:'🎬 動画', script:'📝 台本' };
+const MEDIA_COLORS = { banner:'#F59E0B', copy:'#6C47FF', video:'#EF4444', script:'#10B981' };
+
+function saveHistory(text, crV, xV, metaV) {
+  const totalViolations = crV.length + (xV ? xV.length : 0) + (metaV ? metaV.length : 0);
+  const passed = totalViolations === 0;
+  const platforms = [xV !== null ? 'X' : null, metaV !== null ? 'Meta' : null].filter(Boolean);
+  const preview = text.replace(/\n/g, ' ').trim().slice(0, 60) + (text.length > 60 ? '…' : '');
+  const entry = {
+    id: Date.now(),
+    media,
+    preview,
+    passed,
+    totalViolations,
+    crCount: crV.length,
+    xCount: xV ? xV.length : null,
+    metaCount: metaV ? metaV.length : null,
+    platforms,
+    ts: new Date().toLocaleString('ja-JP', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' })
+  };
+  const hist = getHist();
+  hist.unshift(entry);
+  if (hist.length > 50) hist.length = 50; // 最大50件
+  localStorage.setItem('crHistory', JSON.stringify(hist));
+  renderHistory();
+}
+
+function getHist() {
+  try { return JSON.parse(localStorage.getItem('crHistory') || '[]'); } catch { return []; }
+}
+
+function clearHistory() {
+  if (!confirm('チェック履歴をすべて削除しますか？')) return;
+  localStorage.removeItem('crHistory');
+  renderHistory();
+}
+
+function deleteEntry(id, e) {
+  e.stopPropagation();
+  const hist = getHist().filter(h => h.id !== id);
+  localStorage.setItem('crHistory', JSON.stringify(hist));
+  renderHistory();
+}
+
+function renderHistory() {
+  const hist = getHist();
+  const card = document.getElementById('histCard');
+  const list = document.getElementById('histList');
+
+  if (hist.length === 0) {
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = 'block';
+
+  list.innerHTML = `<div class="hist-list">${hist.map(h => {
+    const color = MEDIA_COLORS[h.media] || '#6C47FF';
+    const label = MEDIA_LABELS[h.media] || h.media;
+    const badge = h.passed
+      ? `<span class="hist-badge hb-pass">✓ 合格</span>`
+      : `<span class="hist-badge hb-fail">⚠ ${h.totalViolations}件の違反</span>`;
+
+    const details = [];
+    if (h.crCount > 0) details.push(`商標${h.crCount}件`);
+    if (h.xCount) details.push(`X:${h.xCount}件`);
+    if (h.metaCount) details.push(`Meta:${h.metaCount}件`);
+    const detailStr = details.length ? ` (${details.join(' / ')})` : '';
+
+    return `<div class="hist-item">
+      <div class="hist-icon" style="background:${color}22;">${label.slice(0,2)}</div>
+      <div class="hist-body">
+        <div class="hist-title">${esc(label)}${h.platforms.length ? '<span style="font-size:10px;color:#94A3B8;font-weight:500;">' + h.platforms.join(' · ') + '</span>' : ''}</div>
+        <div class="hist-preview">${esc(h.preview || '—')}</div>
+      </div>
+      <div class="hist-meta">
+        ${badge}
+        <span class="hist-time">${esc(h.ts)}${detailStr}</span>
+      </div>
+      <button class="hist-del" onclick="deleteEntry(${h.id}, event)" title="削除">✕</button>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+// 起動時に履歴を読み込む
+renderHistory();
 </script>
 </body>
 </html>
