@@ -698,12 +698,53 @@ async function runCheck() {
 /* ─── CR check ─── */
 function getCR(text, cfg) {
   const v = [];
+
+  // ── 商標表記ルール ──
   [...text.matchAll(/お絵描き/g)].forEach(m => v.push({ rule:'漢字表記NG', bad:m[0], good:'お絵かき', ctx:c(text,m.index,m[0].length), desc:'「かき」はひらがなが正しい。「描き」（漢字）はNGです。' }));
   [...text.matchAll(/オエカキム[ーー－]ビ[ーー]/g)].forEach(m => v.push({ rule:'カタカナ表記NG', bad:m[0], good:'「お絵かきムービー®」', ctx:c(text,m.index,m[0].length), desc:'カタカナ表記はNGです。' }));
   [...text.matchAll(/お絵ム[ーー]/g)].forEach(m => v.push({ rule:'略称NG', bad:m[0], good:'「お絵かきムービー®」', ctx:c(text,m.index,m[0].length), desc:'略称はNGです。正式名称を使ってください。' }));
   [...text.matchAll(/認定お絵かきクリエイター/g)].forEach(m => v.push({ rule:'「認定」使用NG', bad:m[0], good:'「お絵かきクリエイター®」', ctx:c(text,m.index,m[0].length), desc:'「認定」という接頭語はNGです。' }));
+  [...text.matchAll(/お絵描きビデオ/g)].forEach(m => v.push({ rule:'誤った商品名NG', bad:m[0], good:'「お絵かきムービー®」', ctx:c(text,m.index,m[0].length), desc:'「お絵描きビデオ」はNGです。正式名称「お絵かきムービー®」を使用してください。' }));
   chkTM(text,'お絵かきムービー',cfg.pattern,v);
   chkTM(text,'お絵かきクリエイター',cfg.pattern,v);
+
+  // ── 就職・雇用を誤解させる表現 ──
+  [...text.matchAll(/お給料/g)].forEach(m => v.push({ rule:'就職誤解表現NG', bad:m[0], good:'収入・報酬', ctx:c(text,m.index,m[0].length), desc:'「お給料」は就職・雇用関係と誤解される表現です。使用しないでください。' }));
+  [...text.matchAll(/給料/g)].forEach(m => v.push({ rule:'就職誤解表現NG', bad:m[0], good:'収入・報酬', ctx:c(text,m.index,m[0].length), desc:'「給料」は就職・雇用関係と誤解される表現です。使用しないでください。' }));
+
+  // ── 誤った職種・肩書き表現 ──
+  [...text.matchAll(/絵師/g)].forEach(m => v.push({ rule:'「絵師」表現NG', bad:m[0], good:'「お絵かきクリエイター®」', ctx:c(text,m.index,m[0].length), desc:'「絵師」という表現はNGです。正式名称「お絵かきクリエイター®」を使用してください。' }));
+
+  // ── 誇大・誤解表現 ──
+  [...text.matchAll(/絵を描くだけで/g)].forEach(m => v.push({ rule:'誇大表現NG', bad:m[0], good:'（表現を見直してください）', ctx:c(text,m.index,m[0].length), desc:'「絵を描くだけで」は業務内容を過度に簡略化した誇大表現です。' }));
+  [...text.matchAll(/売れる絵を学べる/g)].forEach(m => v.push({ rule:'誇大表現NG', bad:m[0], good:'（表現を見直してください）', ctx:c(text,m.index,m[0].length), desc:'「売れる絵を学べる」は成果を保証するような誇大表現です。' }));
+
+  // ── 事業内容の誤表現 ──
+  [...text.matchAll(/イラストスクール/g)].forEach(m => v.push({ rule:'事業内容誤表現NG', bad:m[0], good:'「お絵かきクリエイターズアカデミー」', ctx:c(text,m.index,m[0].length), desc:'「イラストスクール」はNGです。正式名称「お絵かきクリエイターズアカデミー」を使用してください。' }));
+  [...text.matchAll(/ワークレッスン/g)].forEach(m => v.push({ rule:'事業内容誤表現NG', bad:m[0], good:'（正式なサービス名を使用してください）', ctx:c(text,m.index,m[0].length), desc:'「ワークレッスン」はNGです。正式なサービス名称を使用してください。' }));
+
+  // ── 受賞・実績の虚偽表現 ──
+  [...text.matchAll(/(?:公(?:的)?機関|国|政府)(?:から|より)(?:も)?(?:受賞|認定|表彰)/g)].forEach(m => v.push({ rule:'受賞虚偽表現NG', bad:m[0], good:'（根拠のある表現に変更してください）', ctx:c(text,m.index,m[0].length), desc:'「公的機関から受賞」「国から受賞」など事実確認できない受賞表現はNGです。' }));
+  [...text.matchAll(/(?:応募|問い合わせ|申し込み)(?:が|は)?殺到/g)].forEach(m => v.push({ rule:'誇大実績表現NG', bad:m[0], good:'（根拠のある数字か表現を削除してください）', ctx:c(text,m.index,m[0].length), desc:'「殺到」という表現は事実確認できない誇大表現です。' }));
+  [...text.matchAll(/[1１][万万]\s*人以上/g)].forEach(m => v.push({ rule:'誇大実績表現NG', bad:m[0], good:'（根拠のある数字に変更してください）', ctx:c(text,m.index,m[0].length), desc:'「1万人以上」などの根拠のない誇大数字はNGです。' }));
+
+  // ── リモート・在宅完結の誤誘導 ──
+  [...text.matchAll(/リモート完結/g)].forEach(m => v.push({ rule:'リモート完結表現NG', bad:m[0], good:'（正確なサービス内容を記載してください）', ctx:c(text,m.index,m[0].length), desc:'「リモート完結」はサービス内容を誤解させる表現です。' }));
+
+  // ── 仕事の容易さを誇示する表現 ──
+  [...text.matchAll(/(?:お仕事も?)?ネットで探せばゴロゴロ/g)].forEach(m => v.push({ rule:'誇大表現NG', bad:m[0], good:'（表現を見直してください）', ctx:c(text,m.index,m[0].length), desc:'「ネットで探せばゴロゴロ」は仕事の容易さを誇示する誇大表現です。' }));
+
+  // ── 収入断言・個人差注釈チェック ──
+  const hasKojinsa = /個人差|個人の結果|結果には差|成果には差/.test(text);
+  const incomeAsserts = [...text.matchAll(/(?:月[収入]?|年[収入]?)\s*[0-9０-９]+\s*万[円]?(?:稼|達成|突破)|(?:副業で|在宅で|クリエイターとして)\s*(?:稼げる|稼いでいる|月収|年収)/g)];
+  if (incomeAsserts.length > 0 && !hasKojinsa) {
+    incomeAsserts.forEach(m => v.push({ rule:'収入断言・個人差注釈なしNG', bad:m[0], good:m[0]+'（※個人差があります）', ctx:c(text,m.index,m[0].length), desc:'収入に関する断言表現には「※個人差があります」の注釈が必要です。' }));
+  }
+  const incomeSimple = [...text.matchAll(/(?:稼げます|稼げる|儲かります|儲かる)(?![\s\S]{0,50}個人差)/g)];
+  if (incomeSimple.length > 0 && !hasKojinsa) {
+    incomeSimple.forEach(m => v.push({ rule:'収入断言・個人差注釈なしNG', bad:m[0], good:m[0]+'（※個人差があります）', ctx:c(text,m.index,m[0].length), desc:'「稼げる」「儲かる」などの断定表現には「※個人差があります」の注釈が必要です。' }));
+  }
+
   const seen=new Set(); return v.filter(x=>{ const k=x.rule+x.bad; if(seen.has(k))return false; seen.add(k); return true; });
 }
 
