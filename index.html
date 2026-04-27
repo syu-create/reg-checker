@@ -5,166 +5,409 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>お絵かきCR レギュレーションチェッカー</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic UI', sans-serif;
-    background: #f0f2f5;
-    min-height: 100vh;
-    padding: 24px;
-    color: #1a1a2e;
-  }
-  .container { max-width: 860px; margin: 0 auto; }
+:root {
+  --brand: #6C47FF;
+  --brand-dark: #5035CC;
+  --brand-light: #EEE9FF;
+  --x-color: #000000;
+  --x-light: #F0F0F0;
+  --meta-color: #1877F2;
+  --meta-light: #E7F0FD;
+  --cr-color: #7C3AED;
+  --cr-light: #EDE9FE;
+  --ok: #16A34A;
+  --ok-bg: #F0FDF4;
+  --ok-border: #86EFAC;
+  --warn: #D97706;
+  --warn-bg: #FFFBEB;
+  --warn-border: #FCD34D;
+  --fail: #DC2626;
+  --fail-bg: #FEF2F2;
+  --fail-border: #FCA5A5;
+  --bg: #F4F6FA;
+  --surface: #FFFFFF;
+  --text: #111827;
+  --muted: #6B7280;
+  --border: #E5E7EB;
+  --radius: 14px;
+  --radius-sm: 8px;
+}
 
-  .header { text-align: center; margin-bottom: 28px; }
-  .header h1 { font-size: 24px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; }
-  .header p { font-size: 13px; color: #6b7280; }
-  .logo-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white; font-size: 11px; font-weight: 600;
-    padding: 3px 10px; border-radius: 12px; margin-bottom: 12px; letter-spacing: 0.5px;
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-  .card {
-    background: white; border-radius: 16px; padding: 24px;
-    margin-bottom: 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
-  }
-  .card-title { font-size: 13px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 14px; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
 
-  .media-select { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
-  .media-btn {
-    padding: 8px 16px; border: 2px solid #e5e7eb; border-radius: 10px;
-    background: white; font-size: 13px; font-weight: 500; color: #374151;
-    cursor: pointer; transition: all 0.15s;
-  }
-  .media-btn:hover { border-color: #667eea; color: #667eea; }
-  .media-btn.active { border-color: #667eea; background: #667eea; color: white; }
-  .media-hint { font-size: 11px; color: #9ca3af; margin-top: 8px; }
+/* ===== HEADER ===== */
+.app-header {
+  background: linear-gradient(135deg, #6C47FF 0%, #9B59B6 50%, #5B8DEF 100%);
+  padding: 32px 24px 28px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.app-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.header-inner { position: relative; max-width: 800px; margin: 0 auto; }
+.header-tag {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.25);
+}
+.app-header h1 {
+  font-size: 26px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+.app-header p {
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+}
 
-  textarea {
-    width: 100%; min-height: 180px; border: 2px solid #e5e7eb;
-    border-radius: 12px; padding: 14px 16px; font-size: 14px;
-    font-family: inherit; line-height: 1.7; resize: vertical;
-    transition: border-color 0.15s; outline: none; color: #1a1a2e;
-  }
-  textarea:focus { border-color: #667eea; }
-  textarea::placeholder { color: #c4c9d4; }
+/* ===== LAYOUT ===== */
+.main { max-width: 800px; margin: 0 auto; padding: 24px 20px 60px; }
 
-  .check-btn {
-    width: 100%; padding: 14px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white; border: none; border-radius: 12px;
-    font-size: 16px; font-weight: 600; cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s; margin-top: 14px;
-  }
-  .check-btn:hover { opacity: 0.92; transform: translateY(-1px); }
-  .check-btn:active { transform: translateY(0); }
+/* ===== CARD ===== */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 22px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05);
+}
+.card-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+}
 
-  .result-card { display: none; }
+/* ===== MEDIA TABS ===== */
+.tab-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.tab-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: white;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tab-btn:hover { border-color: var(--brand); color: var(--brand); }
+.tab-btn.active {
+  border-color: var(--brand);
+  background: var(--brand-light);
+  color: var(--brand);
+  font-weight: 600;
+}
+.tab-hint {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 8px 12px;
+  background: var(--bg);
+  border-radius: 6px;
+  line-height: 1.5;
+}
 
-  .verdict {
-    display: flex; align-items: center; gap: 14px;
-    padding: 18px 20px; border-radius: 12px; margin-bottom: 20px;
-  }
-  .verdict.pass { background: #f0fdf4; border: 2px solid #86efac; }
-  .verdict.fail { background: #fff7ed; border: 2px solid #fdba74; }
-  .verdict-icon { font-size: 32px; line-height: 1; }
-  .verdict-text h2 { font-size: 18px; font-weight: 700; }
-  .verdict.pass .verdict-text h2 { color: #15803d; }
-  .verdict.fail .verdict-text h2 { color: #c2410c; }
-  .verdict-text p { font-size: 13px; margin-top: 3px; }
-  .verdict.pass .verdict-text p { color: #16a34a; }
-  .verdict.fail .verdict-text p { color: #ea580c; }
+/* ===== PLATFORM TOGGLES ===== */
+.platform-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.platform-label-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: 100%;
+  margin-bottom: 4px;
+}
+.platform-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.platform-toggle.active-x { border-color: #000; background: #F0F0F0; color: #000; font-weight: 600; }
+.platform-toggle.active-meta { border-color: var(--meta-color); background: var(--meta-light); color: var(--meta-color); font-weight: 600; }
+.platform-toggle input { display: none; }
+.platform-icon { font-size: 15px; line-height: 1; }
 
-  .violations-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
-  .violation-item {
-    border: 1px solid #fde68a; border-left: 4px solid #f59e0b;
-    border-radius: 8px; padding: 14px 16px; background: #fffbeb;
-  }
-  .violation-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-  .violation-num { background: #f59e0b; color: white; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; }
-  .violation-rule { font-size: 12px; font-weight: 600; color: #92400e; }
-  .violation-body { display: flex; flex-direction: column; gap: 8px; }
-  .violation-row { display: flex; gap: 10px; align-items: flex-start; }
-  .violation-label { font-size: 11px; font-weight: 600; color: #9ca3af; min-width: 60px; padding-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .violation-content { font-size: 13px; line-height: 1.6; }
-  .bad-text { background: #fee2e2; color: #dc2626; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 13px; }
-  .good-text { background: #dcfce7; color: #16a34a; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 13px; }
+/* ===== TEXTAREA ===== */
+.input-area {
+  width: 100%;
+  min-height: 160px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.75;
+  resize: vertical;
+  transition: border-color 0.15s;
+  outline: none;
+  color: var(--text);
+  background: #FAFAFA;
+}
+.input-area:focus { border-color: var(--brand); background: white; }
+.input-area::placeholder { color: #C0C4CE; }
 
-  .section-label { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-  .corrected-text {
-    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
-    padding: 16px; font-size: 14px; line-height: 1.8;
-    white-space: pre-wrap; word-break: break-all; color: #1a1a2e; position: relative;
-  }
-  .copy-btn {
-    position: absolute; top: 10px; right: 10px;
-    background: #667eea; color: white; border: none; border-radius: 7px;
-    padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer;
-  }
-  .copy-btn:hover { opacity: 0.85; }
+/* ===== CHECK BUTTON ===== */
+.check-btn {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #6C47FF 0%, #5B8DEF 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 12px;
+  letter-spacing: 0.2px;
+  transition: transform 0.12s, box-shadow 0.12s;
+  box-shadow: 0 4px 14px rgba(108,71,255,0.35);
+}
+.check-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(108,71,255,0.4); }
+.check-btn:active { transform: translateY(0); }
 
-  .note-box {
-    background: #eff6ff; border: 1px solid #bfdbfe;
-    border-radius: 10px; padding: 14px 16px;
-    font-size: 13px; color: #1d4ed8; line-height: 1.7;
-  }
-  .note-box strong { display: block; margin-bottom: 6px; font-size: 12px; color: #1e40af; text-transform: uppercase; letter-spacing: 0.5px; }
-  .divider { border: none; border-top: 1px solid #f3f4f6; margin: 20px 0; }
-  .counter-badge { background: #ef4444; color: white; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 10px; margin-left: 6px; }
+/* ===== RESULT SECTIONS ===== */
+.result-card { display: none; }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.section-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.icon-cr { background: var(--cr-light); }
+.icon-x { background: #F0F0F0; }
+.icon-meta { background: var(--meta-light); }
+
+.section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.section-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+/* ===== VERDICT BADGE ===== */
+.verdict-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.badge-pass { background: var(--ok-bg); color: var(--ok); border: 1px solid var(--ok-border); }
+.badge-fail { background: var(--fail-bg); color: var(--fail); border: 1px solid var(--fail-border); }
+.badge-warn { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-border); }
+
+/* ===== VIOLATION ITEMS ===== */
+.violations-wrap { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+
+.v-item {
+  border-radius: 10px;
+  padding: 13px 15px;
+  border: 1px solid;
+}
+.v-item-cr { border-color: #DDD6FE; background: #FAF5FF; }
+.v-item-x { border-color: #D1D5DB; background: #F9FAFB; }
+.v-item-meta { border-color: #BFDBFE; background: #EFF6FF; }
+
+.v-rule {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+.rule-cr { color: var(--cr-color); }
+.rule-x { color: #374151; }
+.rule-meta { color: var(--meta-color); }
+
+.v-rows { display: flex; flex-direction: column; gap: 6px; }
+.v-row { display: flex; gap: 10px; align-items: flex-start; }
+.v-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  min-width: 52px;
+  padding-top: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+.v-val { font-size: 13px; line-height: 1.55; color: var(--text); }
+.chip-bad { background: var(--fail-bg); color: var(--fail); padding: 1px 7px; border-radius: 5px; font-family: monospace; font-size: 12px; }
+.chip-good { background: var(--ok-bg); color: var(--ok); padding: 1px 7px; border-radius: 5px; font-family: monospace; font-size: 12px; }
+
+/* ===== FIXED TEXT ===== */
+.fixed-box {
+  background: #FAFAFA;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 13px;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text);
+  position: relative;
+  margin-top: 14px;
+}
+.copy-btn {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: var(--brand);
+  color: white;
+  border: none;
+  border-radius: 7px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+}
+.copy-btn:hover { opacity: 0.85; }
+
+/* ===== NOTE BOX ===== */
+.note-box {
+  margin-top: 12px;
+  padding: 13px 15px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.note-cr { background: var(--cr-light); color: #4C1D95; border: 1px solid #DDD6FE; }
+.note-ok { background: var(--ok-bg); color: #14532D; border: 1px solid var(--ok-border); }
+.note-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+
+/* ===== DIVIDER ===== */
+hr { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+
+/* ===== PASS ALL ===== */
+.pass-all {
+  text-align: center;
+  padding: 24px;
+  background: var(--ok-bg);
+  border-radius: 12px;
+  border: 2px solid var(--ok-border);
+}
+.pass-all .emoji { font-size: 40px; margin-bottom: 10px; }
+.pass-all h3 { font-size: 18px; font-weight: 800; color: var(--ok); }
+.pass-all p { font-size: 13px; color: #16a34a; margin-top: 4px; }
 </style>
 </head>
 <body>
-<div class="container">
 
-  <div class="header">
-    <div class="logo-badge">お絵かきクリエイターズ</div>
+<div class="app-header">
+  <div class="header-inner">
+    <div class="header-tag">お絵かきクリエイターズ</div>
     <h1>レギュレーションチェッカー</h1>
-    <p>台本・コピー・バナー文言・テロップをチェックします</p>
+    <p>商標 ・ X（Twitter）・ Meta の規約を一括チェック</p>
   </div>
+</div>
 
+<div class="main">
+
+  <!-- 設定カード -->
   <div class="card">
-    <div class="card-title">媒体を選択</div>
-    <div class="media-select" id="mediaSelect">
-      <button class="media-btn active" data-media="banner">バナー・キャッチコピー</button>
-      <button class="media-btn" data-media="video">動画・台本・テロップ</button>
-      <button class="media-btn" data-media="lp">HP・LP・チラシ</button>
+    <div class="card-label">媒体を選択</div>
+    <div class="tab-group" id="mediaTabs">
+      <button class="tab-btn active" data-media="banner">📌 バナー・キャッチコピー</button>
+      <button class="tab-btn" data-media="video">🎬 動画・台本・テロップ</button>
+      <button class="tab-btn" data-media="lp">📄 HP・LP・チラシ</button>
     </div>
-    <div class="media-hint" id="mediaHint">フル表記パターン：すべての箇所に® が必要</div>
+    <div class="tab-hint" id="mediaHint">フル表記パターン：すべての箇所に® が必要</div>
+
+    <div class="platform-row">
+      <div class="platform-label-text">プラットフォーム規約チェック（任意・複数選択可）</div>
+      <label class="platform-toggle" id="toggleX">
+        <input type="checkbox" id="checkX">
+        <span class="platform-icon">✖</span> X（Twitter）
+      </label>
+      <label class="platform-toggle" id="toggleMeta">
+        <input type="checkbox" id="checkMeta">
+        <span class="platform-icon">𝐟</span> Meta（Facebook / Instagram）
+      </label>
+    </div>
   </div>
 
+  <!-- 入力カード -->
   <div class="card">
-    <div class="card-title" id="inputLabel">チェックしたいテキストを貼り付け</div>
-    <textarea id="inputText" placeholder="ここにテキストを貼り付けてください...
+    <div class="card-label" id="inputLabel">チェックしたいテキストを貼り付け</div>
+    <textarea class="input-area" id="inputText" placeholder="ここにテキストを貼り付けてください...
 
 例：
 セールスいらずのお絵かきムービーで、
-認定お絵かきクリエイターになれるプログラムです。"></textarea>
-    <button class="check-btn" onclick="runCheck()">レギュレーションをチェックする</button>
+認定お絵かきクリエイターになれるプログラムです。
+月収30万円も夢じゃない！誰でも簡単に稼げます。"></textarea>
+    <button class="check-btn" onclick="runCheck()">チェックする　→</button>
   </div>
 
+  <!-- 結果カード -->
   <div class="card result-card" id="resultCard">
-    <div class="verdict" id="verdictBox">
-      <div class="verdict-icon" id="verdictIcon"></div>
-      <div class="verdict-text">
-        <h2 id="verdictTitle"></h2>
-        <p id="verdictSub"></p>
-      </div>
-    </div>
-
-    <div id="violationsSection" style="display:none">
-      <div class="section-label">違反箇所 <span class="counter-badge" id="violationCount"></span></div>
-      <div class="violations-list" id="violationsList"></div>
-      <hr class="divider">
-      <div class="section-label">修正済み全文</div>
-      <div class="corrected-text" id="correctedText">
-        <button class="copy-btn" onclick="copyFixed()">コピー</button>
-        <span id="correctedContent"></span>
-      </div>
-    </div>
-
-    <div id="mediaNotesSection"></div>
+    <div id="resultInner"></div>
   </div>
 
 </div>
@@ -177,120 +420,180 @@ const MEDIA_CONFIG = {
     pattern: 'full',
     hint: 'フル表記パターン：すべての箇所に® が必要',
     requiresDeclaration: false,
-    placeholder: 'ここにテキストを貼り付けてください...\n\n例：\nセールスいらずのお絵かきムービーで、\n認定お絵かきクリエイターになれるプログラムです。'
+    placeholder: 'バナーやキャッチコピーのテキストを入力...'
   },
   video: {
     pattern: 'hybrid',
     hint: 'ハイブリッドパターン：冒頭だけ® 付き・中身はカギカッコのみ・末尾に権利宣言文が必要',
     requiresDeclaration: true,
-    placeholder: '動画の台本またはテロップのテキストを貼り付けてください...\n\n例：\n【冒頭テロップ】\nお絵かきムービーで起業しよう！\n\n【中盤ナレーション】\nお絵かきクリエイターになるための...'
+    placeholder: '動画の台本またはテロップのテキストを入力...'
   },
   lp: {
     pattern: 'hybrid',
     hint: 'ハイブリッドパターン：冒頭だけ® 付き・中身はカギカッコのみ・末尾に権利宣言文が必要',
     requiresDeclaration: true,
-    placeholder: 'ここにテキストを貼り付けてください...\n\n例：\n「お絵かきムービー」で集客を自動化。\nお絵かきクリエイターとして独立しませんか？'
+    placeholder: 'LP・チラシのテキストを入力...'
   }
 };
 
 const DECLARATION_TEXT = '※「お絵かきムービー」「お絵かきクリエイター」は株式会社アクアフィールドの登録商標です。';
 
-document.querySelectorAll('.media-btn').forEach(btn => {
+// ===== X規約チェックルール =====
+const X_RULES = [
+  {
+    id: 'x_income_specific',
+    rule: '具体的な収入保証',
+    pattern: /月[収入]?\s*[0-9０-９]+\s*万[円]|年[収入]?\s*[0-9０-９]+\s*万[円]|[0-9０-９]+\s*万[円]\s*(?:稼|儲|収入|達成|突破)/g,
+    desc: '具体的な収入金額を保証・約束するような表現はNGです。',
+    fix: '「収入アップを目指せる」など可能性を示す表現に変更してください。'
+  },
+  {
+    id: 'x_guarantee',
+    rule: '成果・成功の保証表現',
+    pattern: /(?:必ず|絶対に?|確実に?)\s*(?:稼|儲|成功|収入|売れ|売上)/g,
+    desc: '「必ず」「絶対」など100%の成功を保証する表現はNGです。',
+    fix: '「目指せる」「可能性がある」などの表現に変更してください。'
+  },
+  {
+    id: 'x_easy_money',
+    rule: '「誰でも簡単に稼げる」系表現',
+    pattern: /誰[でもとが]\s*(?:簡単に?|すぐに?|楽に?)\s*(?:稼|儲|収入|お金)/g,
+    desc: '「誰でも簡単に稼げる」という誇大な表現はXの広告ポリシー違反になる可能性があります。',
+    fix: '「初心者でも取り組みやすい」など、具体的な特徴を示す表現にしてください。'
+  },
+  {
+    id: 'x_no_skill',
+    rule: '「スキル不要で稼げる」系表現',
+    pattern: /(?:スキル|経験|知識)\s*(?:なし|不要|ゼロ|０)\s*で\s*(?:稼|儲|収入|お金)/g,
+    desc: 'スキル・経験不要で収入が得られるという誇大な表現はNGです。',
+    fix: '「未経験から始められる」など、サポート体制を示す表現にしてください。'
+  },
+  {
+    id: 'x_clickbait',
+    rule: '扇情的・誇大なキャッチコピー',
+    pattern: /(?:衝撃|驚異|奇跡|禁断|極秘|裏技)の(?:方法|稼ぎ方|ノウハウ|テクニック)/g,
+    desc: '「衝撃の方法」「禁断の稼ぎ方」など扇情的な表現はNGです。',
+    fix: 'サービスの具体的な特徴や価値を正直に伝える表現にしてください。'
+  }
+];
+
+// ===== Meta規約チェックルール =====
+const META_RULES = [
+  {
+    id: 'meta_personal_attr',
+    rule: '個人属性への直接言及',
+    pattern: /(?:収入|お金|給料)\s*が\s*(?:少ない|足りない|ない|低い)\s*(?:方|人|あなた|方々)|(?:副業|在宅ワーク|在宅勤務)\s*を\s*(?:探して|お探し|したい)\s*(?:いる|の)?\s*(?:方|人|あなた)/g,
+    desc: 'ターゲットの個人的な財務状況・状態を直接言及するのはMeta広告ポリシー違反です。',
+    fix: '「副業に興味がある方」など中立的な表現にしてください。'
+  },
+  {
+    id: 'meta_income_claim',
+    rule: '収入の保証・約束',
+    pattern: /月[収入]?\s*[0-9０-９]+\s*万[円]|年[収入]?\s*[0-9０-９]+\s*万[円]|(?:必ず|絶対に?)\s*(?:稼|儲|収入)/g,
+    desc: '具体的な収入数字の保証はMeta広告ポリシー違反になります。',
+    fix: '「実績例」として個人の結果であることを明記するか、収入保証の表現を避けてください。'
+  },
+  {
+    id: 'meta_misleading',
+    rule: '誇大・誤解を招く主張',
+    pattern: /(?:日本|国内|業界)\s*(?:最大|最高|No\.?1|ナンバーワン|一位)/g,
+    desc: '「日本最大」「業界No.1」など証明できない最上級表現はNGです。',
+    fix: '根拠のある具体的な数字か、または表現を削除してください。'
+  },
+  {
+    id: 'meta_before_after',
+    rule: '極端なビフォーアフター表現',
+    pattern: /(?:[0-9０-９]+\s*万円?)?(?:から|→|⇒)\s*(?:月[収入]?\s*)?[0-9０-９]+\s*万[円]|(?:月収|年収)\s*[0-9０-９]+\s*倍/g,
+    desc: '「〇万円→〇〇万円」など極端な成果の変化を示す表現はMetaで制限される場合があります。',
+    fix: '個人の実績であることを明記し、「※個人の感想です。成果には個人差があります。」を追記してください。'
+  },
+  {
+    id: 'meta_sensational',
+    rule: 'センセーショナルな表現',
+    pattern: /(?:今だけ|今すぐ|残り[0-9０-９]+名|限定[0-9０-９]+名)\s*(?![\n。])/g,
+    desc: '「今だけ！」「残り○名！」など過度な緊急性・希少性を煽る表現はMeta審査で問題になる場合があります。',
+    fix: '事実に基づく期限・定員情報のみを記載し、扇情的な強調を控えてください。'
+  }
+];
+
+// ===== Media tabs =====
+document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.media-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentMedia = btn.dataset.media;
-    const cfg = MEDIA_CONFIG[currentMedia];
-    document.getElementById('mediaHint').textContent = cfg.hint;
-    document.getElementById('inputText').placeholder = cfg.placeholder;
+    document.getElementById('mediaHint').textContent = MEDIA_CONFIG[currentMedia].hint;
   });
 });
 
+// ===== Platform toggles =====
+document.getElementById('toggleX').addEventListener('click', function() {
+  const cb = document.getElementById('checkX');
+  cb.checked = !cb.checked;
+  this.classList.toggle('active-x', cb.checked);
+});
+document.getElementById('toggleMeta').addEventListener('click', function() {
+  const cb = document.getElementById('checkMeta');
+  cb.checked = !cb.checked;
+  this.classList.toggle('active-meta', cb.checked);
+});
+
+// ===== Main Check =====
 function runCheck() {
   const text = document.getElementById('inputText').value.trim();
   if (!text) { alert('テキストを入力してください。'); return; }
 
   const media = MEDIA_CONFIG[currentMedia];
+  const doX = document.getElementById('checkX').checked;
+  const doMeta = document.getElementById('checkMeta').checked;
+
+  const crViolations = getCRViolations(text, media);
+  const fixed = getFixed(text, media);
+  const xViolations = doX ? getPlatformViolations(text, X_RULES) : null;
+  const metaViolations = doMeta ? getPlatformViolations(text, META_RULES) : null;
+
+  renderResult(text, crViolations, fixed, xViolations, metaViolations, media);
+}
+
+// ===== CR (商標) チェック =====
+function getCRViolations(text, media) {
   const violations = [];
-  let fixed = text;
 
-  // 1. 漢字NG
-  [...text.matchAll(/お絵描き/g)].forEach(m => {
-    violations.push({ rule: '漢字表記NG', bad: m[0], good: 'お絵かき', context: ctx(text, m.index, m[0].length), desc: '「かき」はひらがなが正しい。「描き」（漢字）はNGです。' });
-  });
-  fixed = fixed.replace(/お絵描き/g, 'お絵かき');
+  // 漢字
+  [...text.matchAll(/お絵描き/g)].forEach(m => violations.push({
+    rule: '漢字表記NG', bad: m[0], good: 'お絵かき',
+    context: ctx(text, m.index, m[0].length),
+    desc: '「かき」はひらがなが正しい表記です。「描き」（漢字）はNGです。'
+  }));
 
-  // 2. カタカナNG
-  [...text.matchAll(/オエカキム[ーー－]ビ[ーー]/g)].forEach(m => {
-    violations.push({ rule: '表記揺れ（カタカナ）', bad: m[0], good: '「お絵かきムービー®」', context: ctx(text, m.index, m[0].length), desc: 'カタカナ表記はNGです。' });
-  });
+  // カタカナ
+  [...text.matchAll(/オエカキム[ーー－]ビ[ーー]/g)].forEach(m => violations.push({
+    rule: 'カタカナ表記NG', bad: m[0], good: '「お絵かきムービー®」',
+    context: ctx(text, m.index, m[0].length), desc: 'カタカナ表記はNGです。'
+  }));
 
-  // 3. 略称NG
-  [...text.matchAll(/お絵ム[ーー]/g)].forEach(m => {
-    violations.push({ rule: '略称NG', bad: m[0], good: '「お絵かきムービー®」', context: ctx(text, m.index, m[0].length), desc: '略称はNGです。正式名称を使用してください。' });
-  });
+  // 略称
+  [...text.matchAll(/お絵ム[ーー]/g)].forEach(m => violations.push({
+    rule: '略称NG', bad: m[0], good: '「お絵かきムービー®」',
+    context: ctx(text, m.index, m[0].length), desc: '「お絵ムー」などの略称はNGです。正式名称を使ってください。'
+  }));
 
-  // 4. 認定NG
-  [...text.matchAll(/認定お絵かきクリエイター/g)].forEach(m => {
-    violations.push({ rule: '「認定」使用NG', bad: m[0], good: '「お絵かきクリエイター®」', context: ctx(text, m.index, m[0].length), desc: '「認定」という接頭語を付けるのはNGです。' });
-  });
-  fixed = fixed.replace(/認定お絵かきクリエイター/g, '「お絵かきクリエイター®」');
+  // 認定
+  [...text.matchAll(/認定お絵かきクリエイター/g)].forEach(m => violations.push({
+    rule: '「認定」使用NG', bad: m[0], good: '「お絵かきクリエイター®」',
+    context: ctx(text, m.index, m[0].length), desc: '「認定」という接頭語はNGです。'
+  }));
 
-  // 5. カギカッコ・® チェック
-  checkTrademark(fixed, 'お絵かきムービー', media.pattern, violations);
-  checkTrademark(fixed, 'お絵かきクリエイター', media.pattern, violations);
-  fixed = applyFix(fixed, 'お絵かきムービー', media.pattern);
-  fixed = applyFix(fixed, 'お絵かきクリエイター', media.pattern);
+  // カギカッコ・® チェック
+  checkTM(text, 'お絵かきムービー', media.pattern, violations);
+  checkTM(text, 'お絵かきクリエイター', media.pattern, violations);
 
   // 重複排除
   const seen = new Set();
-  const uniq = violations.filter(v => { const k = v.rule + v.bad; if (seen.has(k)) return false; seen.add(k); return true; });
-
-  // 結果表示
-  const resultCard = document.getElementById('resultCard');
-  resultCard.style.display = 'block';
-  const hasDeclaration = text.includes('株式会社アクアフィールドの登録商標') || text.includes('登録商標');
-
-  if (uniq.length === 0) {
-    setVerdict('pass', '✅', '合格', '違反は見つかりませんでした。問題ありません！');
-    document.getElementById('violationsSection').style.display = 'none';
-  } else {
-    setVerdict('fail', '⚠️', `要修正（${uniq.length}件の違反）`, '以下の違反箇所を修正してください。');
-    document.getElementById('violationsSection').style.display = 'block';
-    document.getElementById('violationCount').textContent = uniq.length;
-
-    const list = document.getElementById('violationsList');
-    list.innerHTML = '';
-    uniq.forEach((v, i) => {
-      list.innerHTML += `
-        <div class="violation-item">
-          <div class="violation-header">
-            <span class="violation-num">違反 ${i + 1}</span>
-            <span class="violation-rule">${esc(v.rule)}</span>
-          </div>
-          <div class="violation-body">
-            <div class="violation-row"><span class="violation-label">該当箇所</span><span class="violation-content"><span class="bad-text">${esc(v.context)}</span></span></div>
-            <div class="violation-row"><span class="violation-label">説明</span><span class="violation-content">${esc(v.desc)}</span></div>
-            <div class="violation-row"><span class="violation-label">修正案</span><span class="violation-content"><span class="good-text">${esc(v.good)}</span></span></div>
-          </div>
-        </div>`;
-    });
-    document.getElementById('correctedContent').textContent = fixed;
-  }
-
-  let notes = '';
-  if (media.requiresDeclaration) {
-    if (!hasDeclaration) {
-      notes = `<div class="note-box" style="margin-top:16px"><strong>追加対応が必要</strong>以下の権利宣言文をフッター・末尾に追加してください。<br><br><strong>権利宣言文（コピペ用）：</strong><br>${esc(DECLARATION_TEXT)}</div>`;
-    } else {
-      notes = `<div class="note-box" style="margin-top:16px; background:#f0fdf4; border-color:#86efac; color:#166534"><strong>権利宣言文</strong>権利宣言文が含まれています。</div>`;
-    }
-  }
-  document.getElementById('mediaNotesSection').innerHTML = notes;
-  resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  return violations.filter(v => { const k = v.rule + v.bad; if (seen.has(k)) return false; seen.add(k); return true; });
 }
 
-function checkTrademark(text, name, pattern, violations) {
+function checkTM(text, name, pattern, violations) {
   const re = new RegExp(name, 'g');
   let m;
   while ((m = re.exec(text)) !== null) {
@@ -298,36 +601,166 @@ function checkTrademark(text, name, pattern, violations) {
     const len = m[0].length;
     const hasBracket = text[idx - 1] === '「';
     const hasReg = text[idx + len] === '®';
-
     if (!hasBracket) {
       violations.push({
-        rule: 'カギカッコなし',
-        bad: text.substring(Math.max(0, idx - 4), idx + len + 4),
+        rule: 'カギカッコなし', bad: text.substring(Math.max(0, idx-3), idx+len+3),
         good: pattern === 'full' ? `「${name}®」` : `「${name}®」（冒頭）または「${name}」（中盤）`,
         context: ctx(text, idx, len),
-        desc: `「${name}」は必ずカギカッコ（「」）で囲んでください。`
-      });
-      return;
+        desc: `「${name}」は必ずカギカッコ（「」）で囲む必要があります。`
+      }); return;
     }
     if (pattern === 'full' && !hasReg) {
       violations.push({
-        rule: '® マーク欠落',
-        bad: `「${name}」`,
-        good: `「${name}®」`,
-        context: ctx(text, idx - 1, len + 2),
+        rule: '® マーク欠落', bad: `「${name}」`, good: `「${name}®」`,
+        context: ctx(text, idx-1, len+2),
         desc: 'バナー・キャッチコピーはフル表記のため、すべての箇所に®が必要です。'
       });
     }
   }
 }
 
-function applyFix(text, name, pattern) {
-  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  text = text.replace(new RegExp(`(?<!「)${escaped}(?![」®])`, 'g'), `「${name}®」`);
-  if (pattern === 'full') {
-    text = text.replace(new RegExp(`「${escaped}」(?!®)`, 'g'), `「${name}®」`);
+function getFixed(text, media) {
+  let fixed = text
+    .replace(/お絵描き/g, 'お絵かき')
+    .replace(/認定お絵かきクリエイター/g, '「お絵かきクリエイター®」');
+
+  const applyFix = (t, name, pattern) => {
+    const e = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    t = t.replace(new RegExp(`(?<!「)${e}(?![」®])`, 'g'), `「${name}®」`);
+    if (pattern === 'full') t = t.replace(new RegExp(`「${e}」(?!®)`, 'g'), `「${name}®」`);
+    return t;
+  };
+  fixed = applyFix(fixed, 'お絵かきムービー', media.pattern);
+  fixed = applyFix(fixed, 'お絵かきクリエイター', media.pattern);
+  return fixed;
+}
+
+// ===== Platform チェック =====
+function getPlatformViolations(text, rules) {
+  const violations = [];
+  rules.forEach(rule => {
+    rule.pattern.lastIndex = 0;
+    const matches = [...text.matchAll(rule.pattern)];
+    if (matches.length > 0) {
+      violations.push({
+        rule: rule.rule,
+        context: ctx(text, matches[0].index, matches[0][0].length),
+        bad: matches[0][0],
+        desc: rule.desc,
+        fix: rule.fix
+      });
+    }
+  });
+  return violations;
+}
+
+// ===== Render =====
+function renderResult(text, crV, fixed, xV, metaV, media) {
+  const rc = document.getElementById('resultCard');
+  rc.style.display = 'block';
+
+  const hasDeclaration = text.includes('株式会社アクアフィールドの登録商標') || text.includes('登録商標');
+  const allClear = crV.length === 0 && (xV === null || xV.length === 0) && (metaV === null || metaV.length === 0);
+
+  let html = '';
+
+  if (allClear) {
+    html = `<div class="pass-all"><div class="emoji">✅</div><h3>すべての項目で合格！</h3><p>商標・プラットフォーム規約に違反は見つかりませんでした。</p></div>`;
+    if (media.requiresDeclaration && !hasDeclaration) {
+      html += noteBox('cr', '追加対応が必要', `以下の権利宣言文をフッター・末尾に追加してください。<br><br><strong>コピペ用：</strong><br>${esc(DECLARATION_TEXT)}`);
+    }
+  } else {
+    // CR セクション
+    html += sectionHTML({
+      icon: '®', iconClass: 'icon-cr',
+      title: '商標レギュレーション', sub: 'お絵かきクリエイターズ 社内規定',
+      violations: crV,
+      itemClass: 'v-item-cr', ruleClass: 'rule-cr',
+      passText: '商標表記に問題はありません。',
+      showFixed: crV.length > 0,
+      fixed: fixed
+    });
+
+    if (crV.length > 0 && media.requiresDeclaration) {
+      html += noteBox('cr',
+        hasDeclaration ? '権利宣言文 ✓ 含まれています' : '権利宣言文を追加してください',
+        hasDeclaration ? '権利宣言文が確認できました。' : `末尾に以下を追記してください：<br><br>${esc(DECLARATION_TEXT)}`
+      );
+    }
+
+    // X セクション
+    if (xV !== null) {
+      html += '<hr>';
+      html += sectionHTML({
+        icon: '✖', iconClass: 'icon-x',
+        title: 'X（Twitter）広告ポリシー', sub: '収入表現・保証・誇大広告チェック',
+        violations: xV,
+        itemClass: 'v-item-x', ruleClass: 'rule-x',
+        passText: 'X広告ポリシーに問題は見つかりませんでした。',
+        showFixed: false
+      });
+    }
+
+    // Meta セクション
+    if (metaV !== null) {
+      html += '<hr>';
+      html += sectionHTML({
+        icon: '𝐟', iconClass: 'icon-meta',
+        title: 'Meta（Facebook / Instagram）広告ポリシー', sub: '個人属性・誇大表現・収入表現チェック',
+        violations: metaV,
+        itemClass: 'v-item-meta', ruleClass: 'rule-meta',
+        passText: 'Meta広告ポリシーに問題は見つかりませんでした。',
+        showFixed: false
+      });
+    }
   }
-  return text;
+
+  document.getElementById('resultInner').innerHTML = html;
+  rc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function sectionHTML({ icon, iconClass, title, sub, violations, itemClass, ruleClass, passText, showFixed, fixed }) {
+  const badge = violations.length === 0
+    ? `<span class="verdict-badge badge-pass">✓ 合格</span>`
+    : `<span class="verdict-badge badge-fail">⚠ ${violations.length}件の違反</span>`;
+
+  let html = `
+    <div class="section-header">
+      <div class="section-icon ${iconClass}">${icon}</div>
+      <div><div class="section-title">${esc(title)}</div><div class="section-sub">${esc(sub)}</div></div>
+      ${badge}
+    </div>`;
+
+  if (violations.length === 0) {
+    html += `<p style="font-size:13px;color:var(--ok);padding:8px 12px;background:var(--ok-bg);border-radius:8px;">✓ ${esc(passText)}</p>`;
+  } else {
+    html += `<div class="violations-wrap">`;
+    violations.forEach((v, i) => {
+      html += `
+        <div class="v-item ${itemClass}">
+          <div class="v-rule ${ruleClass}">違反 ${i+1}　${esc(v.rule)}</div>
+          <div class="v-rows">
+            <div class="v-row"><span class="v-lbl">該当箇所</span><span class="v-val"><span class="chip-bad">${esc(v.context)}</span></span></div>
+            <div class="v-row"><span class="v-lbl">説明</span><span class="v-val">${esc(v.desc)}</span></div>
+            <div class="v-row"><span class="v-lbl">修正案</span><span class="v-val"><span class="chip-good">${esc(v.fix || v.good || '')}</span></span></div>
+          </div>
+        </div>`;
+    });
+    html += `</div>`;
+
+    if (showFixed && fixed) {
+      html += `<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:16px;margin-bottom:8px;">修正済み全文</div>
+        <div class="fixed-box">
+          <button class="copy-btn" onclick="copyFixed(this)">コピー</button>
+          <span class="fixed-content">${esc(fixed)}</span>
+        </div>`;
+    }
+  }
+  return html;
+}
+
+function noteBox(type, title, body) {
+  return `<div class="note-box note-${type}" style="margin-top:12px"><div class="note-title">${esc(title)}</div>${body}</div>`;
 }
 
 function ctx(text, idx, len) {
@@ -335,23 +768,16 @@ function ctx(text, idx, len) {
   return (s > 0 ? '...' : '') + text.substring(s, e) + (e < text.length ? '...' : '');
 }
 
-function setVerdict(type, icon, title, sub) {
-  document.getElementById('verdictBox').className = 'verdict ' + type;
-  document.getElementById('verdictIcon').textContent = icon;
-  document.getElementById('verdictTitle').textContent = title;
-  document.getElementById('verdictSub').textContent = sub;
-}
-
 function esc(str) {
-  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return String(str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-function copyFixed() {
-  const content = document.getElementById('correctedContent').textContent;
+function copyFixed(btn) {
+  const content = btn.nextElementSibling.textContent;
   navigator.clipboard.writeText(content).then(() => {
-    const btn = document.querySelector('.copy-btn');
-    btn.textContent = 'コピー済み！';
-    setTimeout(() => btn.textContent = 'コピー', 1500);
+    btn.textContent = '✓ コピー済み';
+    setTimeout(() => btn.textContent = 'コピー', 1800);
   });
 }
 </script>
