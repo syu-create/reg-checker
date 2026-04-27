@@ -79,7 +79,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .inp::placeholder{color:#C8CDD8;}
 
 /* ── VIDEO INPUT ── */
-.video-inp{display:none;flex-direction:column;gap:12px;}
+.video-inp{display:none;flex-direction:column;gap:14px;}
+/* source selector */
+.src-tabs{display:flex;gap:8px;}
+.src-tab{flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.src-tab:hover{border-color:var(--brand);color:var(--brand);}
+.src-tab.on{border-color:var(--brand);background:#F0EBFF;color:var(--brand);}
+/* url input */
 .url-wrap{display:flex;gap:10px;}
 .url-field{flex:1;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:12px 16px;font-size:14px;font-family:inherit;outline:none;color:var(--text);background:#FAFBFD;transition:border .15s;}
 .url-field:focus{border-color:var(--brand);background:#fff;}
@@ -87,8 +93,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .fetch-btn{padding:12px 20px;background:linear-gradient(135deg,#6C47FF,#9B59B6);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s,transform .1s;}
 .fetch-btn:hover{opacity:.9;transform:translateY(-1px);}
 .fetch-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
-.yt-preview{display:none;border-radius:12px;overflow:hidden;background:#000;aspect-ratio:16/9;position:relative;}
-.yt-preview iframe{width:100%;height:100%;border:none;}
+/* file drop zone */
+.drop-zone{border:2px dashed var(--border);border-radius:12px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .15s;position:relative;display:none;}
+.drop-zone:hover,.drop-zone.over{border-color:var(--brand);background:#F8F5FF;}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.drop-icon{font-size:36px;margin-bottom:10px;}
+.drop-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:5px;}
+.drop-sub{font-size:12px;color:var(--sub);}
+.drop-sub strong{color:var(--brand);}
+/* preview */
+.vid-preview{display:none;border-radius:12px;overflow:hidden;background:#000;aspect-ratio:16/9;}
+.vid-preview iframe,.vid-preview video{width:100%;height:100%;border:none;display:block;}
+.vid-preview video{object-fit:contain;}
+/* status / transcript */
 .fetch-status{font-size:12px;padding:10px 14px;border-radius:8px;display:none;}
 .fetch-status.loading{background:#EEF2FF;color:#4338CA;}
 .fetch-status.ok{background:var(--ok-bg);color:var(--ok);}
@@ -230,15 +247,46 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0;}
 
     <!-- 動画URL入力 -->
     <div id="videoArea" class="video-inp">
-      <div class="url-wrap">
-        <input class="url-field" id="ytUrl" type="url" placeholder="YouTube の URL を貼り付け（例：https://www.youtube.com/watch?v=...）">
-        <button class="fetch-btn" id="fetchBtn" onclick="fetchTranscript()">字幕を取得</button>
+      <!-- ソース切り替えタブ -->
+      <div class="src-tabs">
+        <button class="src-tab on" data-src="youtube" onclick="switchSrc('youtube')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.54 3.5 12 3.5 12 3.5s-7.54 0-9.38.55A3.02 3.02 0 0 0 .5 6.19C0 8.04 0 12 0 12s0 3.96.5 5.81a3.02 3.02 0 0 0 2.12 2.14C4.46 20.5 12 20.5 12 20.5s7.54 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14C24 15.96 24 12 24 12s0-3.96-.5-5.81zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>
+          YouTube
+        </button>
+        <button class="src-tab" data-src="gdrive" onclick="switchSrc('gdrive')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M4.41 19.94 1.28 14.5l2.96-5.17h5.92l2.96 5.17-2.96 5.44H4.41zm7.1-6.72L8.54 8h6.92l2.96 5.22H11.51zm3.43 6.72-2.96-5.44h5.92l3.13 5.44h-6.09z"/></svg>
+          Google Drive
+        </button>
+        <button class="src-tab" data-src="file" onclick="switchSrc('file')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><polyline points="14 2 14 8 20 8"/></svg>
+          MP4ファイル
+        </button>
       </div>
-      <div id="ytPreview" class="yt-preview"></div>
+
+      <!-- URL 入力（YouTube / Google Drive） -->
+      <div id="urlInputWrap">
+        <div class="url-wrap">
+          <input class="url-field" id="videoUrl" type="url" placeholder="YouTube の URL を貼り付け">
+          <button class="fetch-btn" id="fetchBtn" onclick="fetchFromUrl()">読み込む</button>
+        </div>
+      </div>
+
+      <!-- ファイルアップロード -->
+      <div class="drop-zone" id="dropZone">
+        <input type="file" accept="video/mp4,video/*" id="videoFile" onchange="handleVideoFile(this.files[0])">
+        <div class="drop-icon">🎬</div>
+        <div class="drop-title">MP4ファイルをドラッグ＆ドロップ</div>
+        <div class="drop-sub">または <strong>クリックしてファイルを選択</strong></div>
+      </div>
+
+      <!-- プレビュー -->
+      <div class="vid-preview" id="vidPreview"></div>
+
+      <!-- ステータス＆字幕 -->
       <div id="fetchStatus" class="fetch-status"></div>
       <div id="transcriptArea" class="transcript-area">
         <div class="transcript-label" id="transcriptLabel"></div>
-        <textarea id="transcriptText" placeholder="字幕テキストをここに貼り付けてください..."></textarea>
+        <textarea id="transcriptText" placeholder="台本・テロップのテキストをここに貼り付けてください..."></textarea>
       </div>
     </div>
 
@@ -290,51 +338,118 @@ function togglePF(p) {
   }
 }
 
-/* ─── YouTube transcript ─── */
+/* ─── Video source switching ─── */
+let currentSrc = 'youtube';
+
+function switchSrc(src) {
+  currentSrc = src;
+  document.querySelectorAll('.src-tab').forEach(t => t.classList.toggle('on', t.dataset.src === src));
+  const urlWrap = document.getElementById('urlInputWrap');
+  const dropZone = document.getElementById('dropZone');
+  const urlField = document.getElementById('videoUrl');
+
+  if (src === 'file') {
+    urlWrap.style.display = 'none';
+    dropZone.style.display = 'block';
+  } else {
+    urlWrap.style.display = 'block';
+    dropZone.style.display = 'none';
+    urlField.placeholder = src === 'youtube'
+      ? 'YouTube の URL を貼り付け（例：https://www.youtube.com/watch?v=...）'
+      : 'Google Drive の共有URL を貼り付け（例：https://drive.google.com/file/d/...）';
+  }
+  // リセット
+  document.getElementById('vidPreview').style.display = 'none';
+  document.getElementById('vidPreview').innerHTML = '';
+  document.getElementById('fetchStatus').style.display = 'none';
+  document.getElementById('transcriptArea').style.display = 'none';
+  document.getElementById('transcriptText').value = '';
+}
+
+// ドラッグ＆ドロップ
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); const f = e.dataTransfer.files[0]; if (f) handleVideoFile(f); });
+
+function handleVideoFile(file) {
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  const preview = document.getElementById('vidPreview');
+  preview.style.display = 'block';
+  preview.innerHTML = `<video src="${url}" controls></video>`;
+  setStatus('ng', '⚠ ファイルからは字幕を自動取得できません。下のテキストエリアに台本・テロップを貼り付けてください。');
+  showTranscriptManual();
+}
+
+/* ─── URL fetch (YouTube / Google Drive) ─── */
 function getYTId(url) {
   const m = url.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
   return m ? m[1] : null;
 }
 
-async function fetchTranscript() {
-  const url = document.getElementById('ytUrl').value.trim();
-  const vid = getYTId(url);
+function getGDriveId(url) {
+  const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  return m ? m[1] : null;
+}
+
+async function fetchFromUrl() {
+  const url = document.getElementById('videoUrl').value.trim();
   const btn = document.getElementById('fetchBtn');
-  const status = document.getElementById('fetchStatus');
-  const preview = document.getElementById('ytPreview');
-  const taArea = document.getElementById('transcriptArea');
-  const taLabel = document.getElementById('transcriptLabel');
+  if (!url) { setStatus('error', 'URLを入力してください。'); return; }
 
-  if (!vid) {
-    setStatus('error', 'YouTube の URL を入力してください。');
-    return;
+  if (currentSrc === 'youtube' || getYTId(url)) {
+    await fetchYouTube(url, btn);
+  } else if (currentSrc === 'gdrive' || url.includes('drive.google.com')) {
+    fetchGDrive(url);
+  } else {
+    setStatus('error', '対応しているURLを入力してください（YouTube または Google Drive）。');
   }
+}
 
-  // プレビュー表示
+async function fetchYouTube(url, btn) {
+  const vid = getYTId(url);
+  if (!vid) { setStatus('error', 'YouTube の URL を正しく入力してください。'); return; }
+
+  const preview = document.getElementById('vidPreview');
   preview.style.display = 'block';
   preview.innerHTML = `<iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen></iframe>`;
 
   btn.disabled = true;
   btn.textContent = '取得中...';
   setStatus('loading', '字幕データを取得中...');
-  taArea.style.display = 'none';
+  document.getElementById('transcriptArea').style.display = 'none';
 
   const transcript = await tryFetchTranscript(vid);
-
   btn.disabled = false;
-  btn.textContent = '字幕を取得';
+  btn.textContent = '読み込む';
 
   if (transcript && transcript.trim().length > 10) {
     setStatus('ok', `✓ 字幕を取得しました（${transcript.length}文字）。そのままチェックできます。`);
     document.getElementById('transcriptText').value = transcript;
-    taLabel.textContent = '取得した字幕テキスト（編集できます）';
-    taArea.style.display = 'block';
+    document.getElementById('transcriptLabel').textContent = '取得した字幕テキスト（編集できます）';
+    document.getElementById('transcriptArea').style.display = 'block';
   } else {
-    setStatus('ng', '⚠ 字幕の自動取得に失敗しました。下のテキストエリアに手動で台本・テロップを貼り付けてください。');
-    document.getElementById('transcriptText').value = '';
-    taLabel.textContent = '台本・テロップを手動で貼り付け';
-    taArea.style.display = 'block';
+    setStatus('ng', '⚠ 字幕の自動取得に失敗しました。下のテキストエリアに台本・テロップを手動で貼り付けてください。');
+    showTranscriptManual();
   }
+}
+
+function fetchGDrive(url) {
+  const id = getGDriveId(url);
+  if (!id) { setStatus('error', 'Google Drive の URL を正しく入力してください。共有リンクをそのまま貼り付けてください。'); return; }
+
+  const preview = document.getElementById('vidPreview');
+  preview.style.display = 'block';
+  preview.innerHTML = `<iframe src="https://drive.google.com/file/d/${id}/preview" allowfullscreen></iframe>`;
+
+  setStatus('ng', '⚠ Google Drive からは字幕を自動取得できません。下のテキストエリアに台本・テロップを貼り付けてください。');
+  showTranscriptManual();
+}
+
+function showTranscriptManual() {
+  document.getElementById('transcriptLabel').textContent = '台本・テロップを手動で貼り付け';
+  document.getElementById('transcriptArea').style.display = 'block';
 }
 
 async function tryFetchTranscript(vid) {
